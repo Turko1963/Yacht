@@ -1,0 +1,2708 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#06253C">
+<title>Marine Agent · Noble Architecture</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --abyss:#06253C;
+  --navy:#0A3353;
+  --deep:#0F4C75;
+  --ocean:#1273A8;
+  --sky:#3FA9D8;
+  --aqua:#7FD4E8;
+  --foam:#F2F8FC;
+  --surf:#E4F0F7;
+  --white:#fff;
+  --brass:#C08A2E;
+  --brass-lt:#F5EBD6;
+  --coral:#D9534F;
+  --kelp:#1B9E77;
+  --ink:#0B1B27;
+  --ink70:#35505F;
+  --ink45:#6A8294;
+  --ink25:#A3B6C2;
+  --hair:rgba(11,27,39,.10);
+  --hair2:rgba(11,27,39,.055);
+  --mono:'JetBrains Mono',ui-monospace,monospace;
+  --r:16px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--foam);color:var(--ink);font-family:'Inter',system-ui,sans-serif;
+  font-size:15.5px;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+button,input,textarea,select{font-family:inherit}
+::selection{background:var(--sky);color:#fff}
+:focus-visible{outline:2px solid var(--ocean);outline-offset:3px;border-radius:5px}
+.mono{font-family:var(--mono)}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+h1,h2,h3{line-height:1.12;letter-spacing:-.03em;font-weight:800}
+
+/* ---------- splash ---------- */
+.splash{position:fixed;inset:0;z-index:999;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;background:var(--abyss);overflow:hidden;transition:opacity .8s,transform .8s}
+.splash.done{opacity:0;transform:scale(1.1);pointer-events:none}
+.sp-waves{position:absolute;inset:0;opacity:.5}
+.sp-waves i{position:absolute;left:50%;top:50%;border-radius:45%;border:1px solid rgba(127,212,232,.35);
+  transform:translate(-50%,-50%);animation:spW 4s cubic-bezier(.2,.7,.3,1) infinite}
+.sp-waves i:nth-child(1){width:180px;height:180px}
+.sp-waves i:nth-child(2){width:180px;height:180px;animation-delay:1.1s}
+.sp-waves i:nth-child(3){width:180px;height:180px;animation-delay:2.2s}
+@keyframes spW{0%{transform:translate(-50%,-50%) scale(.5) rotate(0);opacity:0}
+  20%{opacity:.8}100%{transform:translate(-50%,-50%) scale(3.4) rotate(140deg);opacity:0}}
+.sp-orb{position:relative;width:104px;height:104px;border-radius:50%;
+  background:radial-gradient(circle at 34% 28%,#CFF3FF 0%,#7FD4E8 32%,#1273A8 68%,#0A3353 100%);
+  box-shadow:0 0 60px rgba(63,169,216,.6),0 0 130px rgba(18,115,168,.4);
+  animation:spBorn 1.3s cubic-bezier(.22,1.2,.36,1) both,spFloat 4s ease-in-out 1.3s infinite}
+@keyframes spBorn{0%{transform:scale(0);opacity:0;filter:blur(16px)}60%{transform:scale(1.16);opacity:1;filter:blur(0)}100%{transform:scale(1)}}
+@keyframes spFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.sp-orb::after{content:'';position:absolute;top:15%;left:19%;width:26%;height:21%;border-radius:50%;
+  background:rgba(255,255,255,.65);filter:blur(3px)}
+.sp-txt{text-align:center;margin-top:30px;padding:0 24px}
+.sp-t{font-size:clamp(26px,6vw,40px);font-weight:900;color:#fff;letter-spacing:.3em;opacity:0;
+  animation:spWrite 1.1s cubic-bezier(.2,.8,.2,1) .95s both}
+@keyframes spWrite{0%{opacity:0;letter-spacing:.6em;filter:blur(8px)}100%{opacity:1;letter-spacing:-.02em;filter:blur(0)}}
+.sp-t em{font-style:normal;background:linear-gradient(95deg,#7FD4E8,#CFF3FF 50%,#A5E8F5);
+  -webkit-background-clip:text;background-clip:text;color:transparent}
+.sp-s{font-family:var(--mono);font-size:11.5px;color:rgba(255,255,255,.5);margin-top:14px;
+  letter-spacing:.22em;opacity:0;animation:spUp .8s ease 1.6s both}
+@keyframes spUp{0%{opacity:0;transform:translateY(10px)}100%{opacity:1;transform:none}}
+.sp-bar{width:130px;height:2px;background:rgba(255,255,255,.14);margin-top:30px;overflow:hidden;
+  border-radius:9px;opacity:0;animation:spUp .5s ease 1.8s both}
+.sp-bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#7FD4E8,#CFF3FF);
+  animation:spLoad 1.5s cubic-bezier(.4,0,.2,1) 1.85s both}
+@keyframes spLoad{to{width:100%}}
+.sp-skip{position:absolute;bottom:calc(26px + env(safe-area-inset-bottom,0px));font-size:11px;
+  color:rgba(255,255,255,.3);opacity:0;animation:spUp .6s ease 2.3s both}
+body.sp-lock{overflow:hidden}
+.shell.sp-in{animation:spReveal .9s cubic-bezier(.2,.8,.2,1) both}
+@keyframes spReveal{0%{opacity:0;transform:scale(.97)}100%{opacity:1;transform:none}}
+
+/* ---------- shell ---------- */
+.shell{min-height:100vh;display:flex;flex-direction:column}
+header{position:sticky;top:0;z-index:40;background:rgba(242,248,252,.9);backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--hair)}
+.hd{max-width:1240px;margin:0 auto;padding:12px 22px;display:flex;align-items:center;gap:14px}
+.logo{display:flex;align-items:center;gap:11px}
+.orb{width:30px;height:30px;border-radius:50%;flex-shrink:0;
+  background:radial-gradient(circle at 34% 28%,#CFF3FF,#7FD4E8 32%,#1273A8 68%,#0A3353);
+  box-shadow:0 3px 14px rgba(18,115,168,.45)}
+.logo b{font-size:17px;font-weight:800;letter-spacing:-.03em}
+.logo span{display:block;font-family:var(--mono);font-size:9.5px;color:var(--ink45);letter-spacing:.12em}
+.hd-right{margin-left:auto;display:flex;align-items:center;gap:9px}
+.pill{font-family:var(--mono);font-size:10px;letter-spacing:.1em;padding:5px 11px;border-radius:99px;
+  background:var(--surf);color:var(--deep)}
+.btn{display:inline-flex;align-items:center;gap:8px;font-size:13.5px;font-weight:600;padding:9px 17px;
+  border-radius:11px;border:1px solid var(--hair);background:#fff;color:var(--ink);cursor:pointer;
+  transition:all .2s;white-space:nowrap}
+.btn:hover{border-color:var(--sky);background:var(--foam)}
+.btn.primary{background:linear-gradient(135deg,var(--ocean),var(--navy));color:#fff;border-color:transparent}
+.btn.primary:hover{filter:brightness(1.12);transform:translateY(-1px)}
+.btn.ghost{background:none;border-color:transparent;color:var(--ink45)}
+.btn.ghost:hover{color:var(--ink);background:var(--surf)}
+
+/* ---------- hero ---------- */
+.hero{max-width:1240px;margin:0 auto;padding:46px 22px 10px;text-align:center}
+.hero-orb{width:86px;height:86px;margin:0 auto 20px;border-radius:50%;position:relative;
+  background:radial-gradient(circle at 34% 28%,#CFF3FF,#7FD4E8 32%,#1273A8 68%,#0A3353);
+  box-shadow:0 14px 40px -12px rgba(18,115,168,.65);animation:spFloat 5s ease-in-out infinite}
+.hero-orb::after{content:'';position:absolute;top:16%;left:20%;width:26%;height:21%;border-radius:50%;
+  background:rgba(255,255,255,.6);filter:blur(3px)}
+.hero h1{font-size:clamp(28px,4.6vw,46px);font-weight:900}
+.hero h1 em{font-style:normal;background:linear-gradient(95deg,var(--ocean),var(--sky) 60%,var(--aqua));
+  -webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{max-width:640px;margin:14px auto 0;font-size:16px;color:var(--ink45);line-height:1.7}
+.hero .eyebrow{font-family:var(--mono);font-size:10.5px;letter-spacing:.24em;color:var(--ocean);
+  margin-bottom:14px}
+
+/* ---------- section tabs ---------- */
+.tabs{max-width:1240px;margin:28px auto 0;padding:0 22px;display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.tab{text-align:left;padding:15px 16px;border-radius:14px;border:1.5px solid var(--hair);background:#fff;
+  cursor:pointer;transition:all .22s;position:relative;overflow:hidden}
+.tab:hover{border-color:var(--sky);transform:translateY(-2px)}
+.tab.on{border-color:var(--ocean);background:linear-gradient(160deg,#fff,var(--surf));
+  box-shadow:0 12px 28px -18px rgba(10,51,83,.7)}
+.tab-n{font-family:var(--mono);font-size:10px;color:var(--ink25);letter-spacing:.1em}
+.tab.on .tab-n{color:var(--ocean)}
+.tab b{display:block;font-size:15px;font-weight:700;margin-top:5px;letter-spacing:-.02em}
+.tab span{display:block;font-size:11.5px;color:var(--ink45);margin-top:3px;line-height:1.45}
+
+/* ---------- search + chips ---------- */
+.searchbar{max-width:1240px;margin:22px auto 0;padding:0 22px;display:flex;gap:10px;align-items:center}
+.searchbar input{flex:1;border:1px solid var(--hair);border-radius:12px;padding:12px 16px;font-size:14.5px;
+  background:#fff;outline:none;transition:all .2s}
+.searchbar input:focus{border-color:var(--sky);box-shadow:0 0 0 4px rgba(63,169,216,.12)}
+.searchbar .cnt{font-family:var(--mono);font-size:11px;color:var(--ink45);min-width:74px}
+.chips{max-width:1240px;margin:14px auto 0;padding:0 22px 8px;display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:9px}
+.chip{display:flex;align-items:flex-start;gap:10px;text-align:left;padding:13px 14px;border-radius:13px;
+  border:1px solid var(--hair);background:#fff;cursor:pointer;transition:all .18s}
+.chip:hover{border-color:var(--sky);transform:translateY(-2px);box-shadow:0 10px 24px -18px rgba(10,51,83,.8)}
+.chip-n{font-family:var(--mono);font-size:9.5px;width:21px;height:21px;border-radius:7px;flex-shrink:0;
+  background:var(--surf);color:var(--deep);display:flex;align-items:center;justify-content:center;font-weight:700}
+.chip-x b{display:block;font-size:13.5px;font-weight:650;letter-spacing:-.01em}
+.chip-x span{display:block;font-size:11.5px;color:var(--ink45);margin-top:2px;line-height:1.45}
+
+/* ---------- answer stage ---------- */
+.stage{max-width:1240px;margin:0 auto;padding:18px 22px 90px;display:none}
+.stage.on{display:block}
+.ask{display:flex;gap:11px;align-items:flex-start;margin-bottom:16px}
+.ask-q{background:linear-gradient(135deg,var(--navy),var(--abyss));color:#fff;padding:12px 17px;
+  border-radius:14px 14px 14px 4px;font-size:14.5px;font-weight:500;max-width:80%}
+.ans{display:flex;gap:12px;align-items:flex-start}
+.ans .orb{margin-top:3px;width:28px;height:28px}
+.ans-body{flex:1;min-width:0}
+.srcs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.src{font-family:var(--mono);font-size:9.5px;letter-spacing:.06em;color:var(--deep);background:var(--surf);
+  padding:4px 9px;border-radius:6px}
+.lead{font-size:15px;line-height:1.7;color:var(--ink70);margin-bottom:14px}
+.lead b{color:var(--ink);font-weight:700}
+.insight{margin-top:16px;padding:14px 16px;border-radius:13px;background:#fff;border:1px solid var(--hair);
+  border-left:3px solid var(--ocean);font-size:14px;line-height:1.7;color:var(--ink70)}
+.insight b{color:var(--deep)}
+.navrow{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.navrow .t{font-size:13px;font-weight:700;color:var(--ink45);margin-right:auto}
+
+/* ---------- generic blocks ---------- */
+.g{display:flex;flex-direction:column;gap:14px}
+.card{background:#fff;border:1px solid var(--hair);border-radius:var(--r);padding:17px 19px;
+  box-shadow:0 1px 2px rgba(11,27,39,.03)}
+.card.tight{padding:13px 15px}
+.chead{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:13px;flex-wrap:wrap}
+.ctitle{font-size:14.5px;font-weight:700;display:flex;align-items:center;gap:9px;letter-spacing:-.02em}
+.ctitle::before{content:'';width:3px;height:15px;border-radius:2px;background:var(--ocean)}
+.lbl{font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;color:var(--ink45)}
+.val{font-size:21px;font-weight:800;letter-spacing:-.04em;margin-top:4px}
+.sub{font-size:11.5px;color:var(--ink45);margin-top:2px;line-height:1.5}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:11px}
+.split{display:grid;grid-template-columns:1.15fr .85fr;gap:14px}
+.tag{font-family:var(--mono);font-size:10px;padding:3px 9px;border-radius:6px;background:var(--surf);color:var(--deep)}
+.tag.ok{background:rgba(27,158,119,.12);color:#13775A}
+.tag.warn{background:rgba(192,138,46,.14);color:#8A6114}
+.tag.bad{background:rgba(217,83,79,.12);color:#A93B38}
+.tag.sky{background:rgba(63,169,216,.14);color:#0B5E8A}
+.hero-card{background:linear-gradient(140deg,var(--navy),var(--deep) 60%,var(--ocean));color:#fff;
+  border:none;position:relative;overflow:hidden}
+.hero-card::after{content:'';position:absolute;inset:-40% -15% auto auto;width:300px;height:300px;
+  background:radial-gradient(circle,rgba(127,212,232,.3),transparent 70%);filter:blur(40px)}
+.hero-card .lbl,.hero-card .sub{color:rgba(255,255,255,.72)}
+.hero-card .ctitle::before{background:var(--aqua)}
+.hc-in{position:relative;z-index:1}
+.hc-t{font-size:19px;font-weight:800;margin-top:5px;letter-spacing:-.03em}
+
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;font-family:var(--mono);font-size:9.5px;letter-spacing:.07em;color:var(--ink45);
+  padding:8px 10px;border-bottom:1.5px solid var(--hair);white-space:nowrap}
+td{padding:10px;border-bottom:1px solid var(--hair2);vertical-align:top}
+tr:last-child td{border-bottom:none}
+td.lead-c{font-weight:650}
+tr.hi{background:linear-gradient(90deg,rgba(63,169,216,.08),transparent)}
+tr.bad{background:linear-gradient(90deg,rgba(217,83,79,.07),transparent)}
+
+.bar{display:grid;grid-template-columns:130px 1fr 72px;align-items:center;gap:12px;padding:6px 0}
+.bar-n{font-size:12.5px;font-weight:550}
+.track{height:9px;border-radius:99px;background:var(--surf);overflow:hidden}
+.fill{height:100%;border-radius:99px;width:0;transition:width 1s cubic-bezier(.2,.8,.2,1)}
+.bar-v{font-family:var(--mono);font-size:12px;font-weight:700;text-align:right}
+
+.steps{display:flex;flex-direction:column}
+.step{display:grid;grid-template-columns:26px 1fr auto;gap:12px;padding:10px 0;position:relative;align-items:start}
+.step:not(:last-child)::before{content:'';position:absolute;left:12px;top:34px;bottom:-6px;width:2px;background:var(--surf)}
+.sdot{width:24px;height:24px;border-radius:50%;background:var(--surf);border:2px solid var(--surf);
+  display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:10px;
+  font-weight:700;color:var(--ink45);z-index:1}
+.step.done .sdot{background:var(--kelp);border-color:var(--kelp);color:#fff}
+.step.now .sdot{background:#fff;border-color:var(--ocean);color:var(--ocean);box-shadow:0 0 0 4px rgba(18,115,168,.15)}
+.step b{font-size:13.5px;font-weight:650;display:block}
+.step span{font-size:12px;color:var(--ink45);display:block;margin-top:3px;line-height:1.55}
+.step .when{font-family:var(--mono);font-size:10.5px;color:var(--ink45);white-space:nowrap}
+
+.item{display:flex;gap:11px;align-items:flex-start;padding:9px 0}
+.item-i{width:30px;height:30px;border-radius:9px;background:var(--surf);display:flex;align-items:center;
+  justify-content:center;font-size:15px;flex-shrink:0}
+.item b{display:block;font-size:13.5px;font-weight:650}
+.item span{display:block;font-size:12px;color:var(--ink45);margin-top:2px;line-height:1.55}
+.row{display:flex;gap:9px;align-items:flex-start;padding:6px 0;font-size:13.5px;line-height:1.6}
+.dot{width:5px;height:5px;border-radius:50%;background:var(--ocean);flex-shrink:0;margin-top:8px}
+.kv{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--hair2);font-size:13px}
+.kv:last-child{border-bottom:none}
+.kv b{font-weight:650;text-align:right}
+.strip{display:flex;gap:11px;align-items:flex-start;padding:13px 15px;border-radius:13px;font-size:13.5px;
+  line-height:1.65;background:var(--surf);border:1px solid rgba(63,169,216,.22);color:var(--ink70)}
+.strip.warn{background:var(--brass-lt);border-color:rgba(192,138,46,.28)}
+.strip.bad{background:rgba(217,83,79,.07);border-color:rgba(217,83,79,.22)}
+.strip.ok{background:rgba(27,158,119,.08);border-color:rgba(27,158,119,.22)}
+.strip i{font-style:normal;font-size:17px;flex-shrink:0}
+.acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+.act{font-size:12.5px;font-weight:600;padding:9px 15px;border-radius:10px;border:1px solid var(--hair);
+  background:#fff;color:var(--deep);cursor:pointer;transition:all .18s}
+.act:hover{background:var(--surf);border-color:var(--sky)}
+.act.primary{background:linear-gradient(135deg,var(--ocean),var(--navy));color:#fff;border-color:transparent}
+
+/* agents */
+.agrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:11px}
+.agent{border:1px solid var(--hair);border-radius:14px;padding:14px;background:#fff;transition:all .2s;
+  position:relative}
+.agent.on{border-color:rgba(27,158,119,.4);background:linear-gradient(160deg,#fff,rgba(27,158,119,.05))}
+.agent-top{display:flex;align-items:center;gap:9px;margin-bottom:8px}
+.agent-ic{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;
+  font-size:15px;background:var(--surf);flex-shrink:0}
+.agent b{font-size:13px;font-weight:700;line-height:1.3;letter-spacing:-.01em}
+.agent p{font-size:11.5px;color:var(--ink45);line-height:1.5;min-height:34px}
+.agent-f{display:flex;align-items:center;justify-content:space-between;margin-top:10px;padding-top:9px;
+  border-top:1px solid var(--hair2)}
+.agent-st{font-family:var(--mono);font-size:9.5px;color:var(--ink25)}
+.agent.on .agent-st{color:#13775A}
+.sw{position:relative;width:38px;height:22px;border-radius:99px;background:#D9E4EC;border:none;cursor:pointer;
+  transition:background .22s;flex-shrink:0}
+.sw.on{background:var(--kelp)}
+.sw::after{content:'';position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;
+  background:#fff;transition:transform .22s cubic-bezier(.4,1.4,.5,1);box-shadow:0 1px 3px rgba(0,0,0,.25)}
+.sw.on::after{transform:translateX(16px)}
+.aphase{font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--ink45);
+  margin:18px 0 9px;display:flex;align-items:center;gap:10px}
+.aphase::after{content:'';flex:1;height:1px;background:var(--hair)}
+
+/* deck plan */
+.deck{background:#fff;border:1px solid var(--hair);border-radius:var(--r);padding:16px;overflow-x:auto}
+.deck svg{min-width:560px;width:100%;height:auto;display:block}
+.legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:12px;font-size:11.5px;color:var(--ink45)}
+.legend i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+
+footer{margin-top:auto;border-top:1px solid var(--hair);padding:22px 0;background:#fff}
+.foot{max-width:1240px;margin:0 auto;padding:0 22px;display:flex;justify-content:space-between;gap:16px;
+  flex-wrap:wrap;font-family:var(--mono);font-size:10.5px;color:var(--ink25)}
+
+@media (max-width:980px){
+  .tabs{grid-template-columns:1fr 1fr}
+  .g3,.g4,.split,.g2{grid-template-columns:1fr}
+  .bar{grid-template-columns:100px 1fr 60px}
+}
+@media (max-width:620px){
+  .tabs{grid-template-columns:1fr;gap:8px}
+  .chips{grid-template-columns:1fr}
+  .hero{padding-top:30px}
+  .hd{padding:10px 14px}
+  .hero,.tabs,.searchbar,.chips,.stage{padding-left:14px;padding-right:14px}
+  .searchbar .cnt{display:none}
+  .searchbar input{font-size:16px}
+  .ask-q{max-width:100%}
+  .card{padding:14px}
+  table{font-size:12px}
+  th,td{padding:7px 6px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<style>
+/* ---------- demo player ---------- */
+.rn{display:flex;flex-direction:column;gap:14px}
+.rn-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;
+  background:linear-gradient(140deg,var(--navy),var(--deep) 60%,var(--ocean));color:#fff;
+  border-radius:var(--r);padding:20px 22px;position:relative;overflow:hidden}
+.rn-head::after{content:'';position:absolute;inset:-40% -10% auto auto;width:300px;height:300px;
+  background:radial-gradient(circle,rgba(127,212,232,.3),transparent 70%);filter:blur(40px)}
+.rn-head>*{position:relative;z-index:1}
+.rn-eyebrow{font-family:var(--mono);font-size:10px;letter-spacing:.2em;color:var(--aqua)}
+.rn-t{font-size:21px;font-weight:800;letter-spacing:-.03em;margin-top:6px}
+.rn-s{font-size:13px;color:rgba(255,255,255,.7);margin-top:4px}
+.rn-ctl{display:flex;gap:7px;flex-wrap:wrap}
+.rn-ctl .btn{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.2);color:#fff}
+.rn-ctl .btn:hover{background:rgba(255,255,255,.24)}
+.rn-ctl .btn.primary{background:#fff;color:var(--navy)}
+.rn-ctl .btn.ghost{background:none;border-color:transparent;color:rgba(255,255,255,.6)}
+.rn-input{font-size:13.5px;color:var(--ink70);background:#fff;border:1px solid var(--hair);
+  border-radius:12px;padding:13px 15px;line-height:1.6}
+.rn-input b{color:var(--deep)}
+.rn-prog{height:4px;background:var(--surf);border-radius:99px;overflow:hidden}
+.rn-prog i{display:block;height:100%;width:0;border-radius:99px;
+  background:linear-gradient(90deg,var(--aqua),var(--ocean));transition:width .4s}
+.rn-meta{display:flex;justify-content:space-between;font-family:var(--mono);font-size:10.5px;color:var(--ink45)}
+.rn-grid{display:grid;grid-template-columns:1fr 280px;gap:14px;align-items:start}
+.rn-log{background:#fff;border:1px solid var(--hair);border-radius:var(--r);padding:8px 14px;
+  max-height:520px;overflow-y:auto;min-height:240px}
+.rn-empty{color:var(--ink25);font-size:13.5px;text-align:center;padding:60px 20px}
+.rn-phase{font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;color:var(--ocean);
+  padding:14px 0 6px;display:flex;align-items:center;gap:10px}
+.rn-phase::after{content:'';flex:1;height:1px;background:var(--hair)}
+.rn-step{display:grid;grid-template-columns:30px 1fr 18px;gap:11px;padding:10px 0;
+  border-bottom:1px solid var(--hair2);opacity:0;transform:translateY(6px);
+  animation:rnIn .35s ease forwards}
+@keyframes rnIn{to{opacity:1;transform:none}}
+.rn-step:last-child{border-bottom:none}
+.rn-ic{width:28px;height:28px;border-radius:9px;background:var(--surf);display:flex;align-items:center;
+  justify-content:center;font-size:14px;color:var(--deep)}
+.rn-step.working .rn-ic{background:var(--ocean);color:#fff;animation:rnPulse 1s ease-in-out infinite}
+.rn-step.done .rn-ic{background:rgba(27,158,119,.14);color:#13775A}
+@keyframes rnPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
+.rn-a{font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;color:var(--ink45)}
+.rn-tt{font-size:13.5px;font-weight:650;margin-top:2px}
+.rn-d{font-size:12.5px;color:var(--ink45);margin-top:2px;line-height:1.55}
+.rn-art{display:inline-flex;align-items:center;gap:7px;margin-top:7px;font-size:11.5px;font-weight:600;
+  color:var(--deep);background:var(--surf);padding:4px 10px;border-radius:7px}
+.rn-k{font-family:var(--mono);font-size:8.5px;background:var(--ocean);color:#fff;padding:2px 5px;border-radius:4px}
+.rn-find{margin-top:8px;font-size:12.5px;line-height:1.6;padding:8px 11px;border-radius:9px;
+  background:var(--brass-lt);border-left:2px solid var(--brass);color:var(--ink70)}
+.rn-find b{color:#8A6114;display:block;font-size:11px;letter-spacing:.04em;margin-bottom:2px}
+.rn-find.bad{background:rgba(217,83,79,.08);border-left-color:var(--coral)}
+.rn-find.bad b{color:#A93B38}
+.rn-find.ok{background:rgba(27,158,119,.09);border-left-color:var(--kelp)}
+.rn-find.ok b{color:#13775A}
+.rn-tick{color:var(--ink25);font-size:9px;padding-top:9px}
+.rn-step.done .rn-tick{color:var(--kelp)}
+.rn-side{display:flex;flex-direction:column;gap:11px;position:sticky;top:76px}
+.rn-faces{display:flex;gap:5px;flex-wrap:wrap;margin-top:9px}
+.rn-face{width:26px;height:26px;border-radius:8px;background:var(--surf);display:flex;align-items:center;
+  justify-content:center;font-size:12px;color:var(--deep);animation:rnIn .3s ease}
+.rn-arts{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.rn-none{font-size:12px;color:var(--ink25)}
+.rn-artrow{display:flex;align-items:center;gap:7px;font-size:11.5px;font-weight:600;color:var(--ink70);
+  background:var(--foam);padding:6px 9px;border-radius:8px;animation:rnIn .3s ease}
+.rn-done{background:#fff;border:1.5px solid rgba(27,158,119,.35);border-radius:var(--r);padding:20px;
+  animation:rnIn .5s ease}
+.rn-done-t{font-size:18px;font-weight:800;color:#13775A;letter-spacing:-.02em}
+.rn-kpi{background:var(--foam);border-radius:11px;padding:12px 13px}
+.rn-out{background:var(--foam);border-radius:12px;padding:14px 16px}
+@media (max-width:980px){
+  .rn-grid{grid-template-columns:1fr}
+  .rn-side{position:static;flex-direction:row;flex-wrap:wrap}
+  .rn-side .card{flex:1 1 180px}
+}
+@media (max-width:620px){
+  .rn-head{padding:16px}
+  .rn-t{font-size:17px}
+  .rn-ctl{width:100%}
+  .rn-ctl .btn{flex:1 1 40%;justify-content:center}
+  .rn-log{max-height:400px}
+}
+</style>
+<style>
+.chip.demo{border-color:rgba(18,115,168,.35);background:linear-gradient(140deg,#fff,var(--surf))}
+.chip.demo:hover{border-color:var(--ocean)}
+.chip-n.play{background:var(--ocean);color:#fff;font-size:10px}
+</style>
+<style>
+/* ---------- deliverable documents ---------- */
+.doc-card{text-align:left;background:#fff;border:1px solid var(--hair);border-radius:14px;padding:16px;
+  cursor:pointer;transition:all .2s;display:flex;flex-direction:column;gap:7px}
+.doc-card:hover{border-color:var(--ocean);transform:translateY(-2px);box-shadow:0 12px 28px -20px rgba(10,51,83,.9)}
+.doc-card-k{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;color:var(--ink45)}
+.doc-card-t{font-size:15px;font-weight:700;letter-spacing:-.02em}
+.doc-card-f{display:flex;align-items:center;justify-content:space-between;margin-top:4px}
+.doc-card-o{font-size:12.5px;font-weight:600;color:var(--ocean)}
+
+.doc-ov{position:fixed;inset:0;z-index:200;background:rgba(6,37,60,.72);backdrop-filter:blur(8px);
+  display:flex;align-items:center;justify-content:center;padding:18px;opacity:0;transition:opacity .25s}
+.doc-ov.on{opacity:1}
+.doc-box{width:min(1120px,100%);max-height:94vh;background:var(--foam);border-radius:16px;overflow:hidden;
+  display:flex;flex-direction:column;box-shadow:0 40px 100px -30px rgba(0,0,0,.6)}
+.doc-bar{display:flex;align-items:center;gap:11px;padding:11px 15px;background:var(--abyss);color:#fff}
+.doc-tag{font-family:var(--mono);font-size:9px;letter-spacing:.1em;background:rgba(127,212,232,.2);
+  color:var(--aqua);padding:4px 9px;border-radius:6px}
+.doc-bt{flex:1;font-size:14px;font-weight:650}
+.doc-bar .btn{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.18);color:#fff;padding:6px 13px;font-size:12.5px}
+.doc-x{background:rgba(255,255,255,.12);border:none;color:#fff;width:28px;height:28px;border-radius:8px;cursor:pointer}
+.doc-scroll{overflow-y:auto;padding:18px;background:#E8EEF3}
+
+.doc{background:#fff;max-width:900px;margin:0 auto;border:1px solid #C7D6E0;box-shadow:0 2px 12px rgba(10,51,83,.1)}
+.doc-top{display:flex;justify-content:space-between;align-items:center;padding:14px 20px;
+  border-bottom:2px solid var(--navy)}
+.doc-brand{display:flex;align-items:center;gap:10px}
+.doc-orb{width:24px;height:24px;border-radius:50%;
+  background:radial-gradient(circle at 34% 28%,#CFF3FF,#7FD4E8 32%,#1273A8 68%,#0A3353)}
+.doc-brand b{display:block;font-size:12.5px;font-weight:800;letter-spacing:.04em}
+.doc-brand span{display:block;font-family:var(--mono);font-size:8px;color:var(--ink45);letter-spacing:.1em}
+.doc-stamp{font-family:var(--mono);font-size:10px;letter-spacing:.1em;padding:6px 13px;border:2px solid var(--ink25);
+  color:var(--ink45);border-radius:4px;transform:rotate(-2deg)}
+.doc-stamp.ok{border-color:var(--kelp);color:#13775A}
+.doc-stamp.bad{border-color:var(--coral);color:#A93B38}
+.doc-stamp.warn{border-color:var(--brass);color:#8A6114}
+.doc-title{padding:16px 20px 10px}
+.doc-k{font-family:var(--mono);font-size:9px;letter-spacing:.14em;color:var(--ocean)}
+.doc-title h4{font-size:17px;font-weight:800;letter-spacing:-.02em;margin-top:5px}
+.doc-block{padding:4px 20px 18px}
+.dwg{width:100%;height:auto;background:#FCFDFE;border:1px solid #D7E3EB;border-radius:4px;display:block}
+.doc-notes{margin-top:14px}
+.doc-nh{font-family:var(--mono);font-size:9px;letter-spacing:.14em;color:var(--ink45);margin-bottom:7px}
+.doc-notes ol{margin:0;padding-left:18px}
+.doc-notes li{font-size:12px;line-height:1.65;color:var(--ink70);margin-bottom:4px}
+.doc-intro{font-size:12.5px;line-height:1.7;color:var(--ink70);background:var(--foam);padding:11px 13px;
+  border-radius:7px;border-left:3px solid var(--ocean)}
+.doc-tbl{width:100%;border-collapse:collapse;font-size:11.5px;margin-top:12px}
+.doc-tbl th{background:var(--navy);color:#fff;font-family:var(--mono);font-size:8.5px;letter-spacing:.08em;
+  padding:7px 8px;text-align:left;border:none}
+.doc-tbl td{padding:7px 8px;border-bottom:1px solid #E2EBF1;vertical-align:top;line-height:1.5}
+.doc-tbl td.v{font-family:var(--mono);font-weight:700;color:var(--deep);white-space:nowrap}
+.doc-tbl tr.chg{background:#FEF8EC}
+.doc-tbl tr.bad-row{background:#FDF0EF}
+.doc-tbl tr.tot td{border-top:2px solid var(--navy);font-weight:800;background:var(--foam)}
+.doc-tbl.sm{font-size:11px}
+.rs{font-family:var(--mono);font-size:8.5px;font-weight:700;padding:3px 7px;border-radius:4px;
+  background:#E6EDF2;color:var(--ink45);white-space:nowrap}
+.rs.ok{background:#DFF3EC;color:#13775A}
+.rs.bad{background:#FBE4E3;color:#A93B38}
+.rs.warn{background:#FBF0DC;color:#8A6114}
+.doc-kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:1px;background:#D7E3EB;
+  border:1px solid #D7E3EB;margin-top:14px}
+.doc-kpi div{background:#fff;padding:10px 12px}
+.doc-kpi span{display:block;font-family:var(--mono);font-size:8px;letter-spacing:.1em;color:var(--ink45)}
+.doc-kpi b{display:block;font-size:17px;font-weight:800;margin-top:3px;letter-spacing:-.03em}
+.doc-sign{display:flex;gap:26px;flex-wrap:wrap;margin-top:18px;padding-top:12px;border-top:1px dashed #C7D6E0}
+.doc-sign div{min-width:150px}
+.doc-sign span{display:block;font-family:var(--mono);font-size:8.5px;color:var(--ink45);letter-spacing:.08em}
+.doc-sign i{display:block;font-family:Georgia,serif;font-style:italic;font-size:15px;color:var(--navy);
+  margin-top:6px;padding-bottom:4px;border-bottom:1px solid var(--ink25)}
+.doc-cert{text-align:center;padding:16px 10px}
+.doc-cert-h{font-family:var(--mono);font-size:13px;letter-spacing:.3em;color:var(--navy);margin-bottom:16px}
+.doc-cert p{font-size:12.5px;line-height:1.8;color:var(--ink70);max-width:620px;margin:0 auto}
+.doc-cert-v{font-size:16px;font-weight:800;color:var(--navy);margin:14px 0;letter-spacing:-.01em}
+.doc-cert-n{font-size:11px !important;color:var(--ink45) !important;margin-top:14px !important}
+.doc-rev{margin-top:16px}
+.doc-tb{display:grid;grid-template-columns:repeat(4,1fr);border-top:2px solid var(--navy);background:var(--foam)}
+.doc-tb div{padding:8px 11px;border-right:1px solid #D7E3EB;border-bottom:1px solid #D7E3EB}
+.doc-tb span{display:block;font-family:var(--mono);font-size:7.5px;letter-spacing:.1em;color:var(--ink45)}
+.doc-tb b{display:block;font-size:11.5px;font-weight:700;margin-top:2px}
+.rn-artrow{cursor:pointer}
+.rn-artrow:hover{background:var(--surf)}
+.rn-art{cursor:pointer}
+.rn-art:hover{background:#D5E7F1}
+@media (max-width:760px){
+  .doc-tb{grid-template-columns:repeat(2,1fr)}
+  .doc-scroll{padding:10px}
+  .doc-block{padding:4px 12px 14px}
+  .doc-title{padding:12px 12px 8px}
+  .doc-top{padding:11px 12px}
+  .doc-tbl{font-size:10.5px}
+  .doc-tbl th,.doc-tbl td{padding:5px 5px}
+}
+@media print{
+  .doc-ov{position:static;background:none;padding:0}
+  .doc-bar,.doc-x{display:none}
+  .doc-box{max-height:none;box-shadow:none}
+  .doc-scroll{overflow:visible;padding:0;background:#fff}
+}
+</style>
+<style>
+.chip.deliv{border-color:rgba(192,138,46,.4);background:linear-gradient(140deg,#fff,var(--brass-lt))}
+.chip.deliv:hover{border-color:var(--brass)}
+.chip-n.doc{background:var(--brass);color:#fff}
+</style>
+<body>
+
+<div class="splash" id="splash">
+  <div class="sp-waves"><i></i><i></i><i></i></div>
+  <div class="sp-orb"></div>
+  <div class="sp-txt">
+    <div class="sp-t">MARINE <em>AGENT</em></div>
+    <div class="sp-s">NOBLE ARCHITECTURE</div>
+  </div>
+  <div class="sp-bar"><i></i></div>
+  <div class="sp-skip">tap to skip</div>
+</div>
+
+<div class="shell">
+  <header>
+    <div class="hd">
+      <div class="logo">
+        <div class="orb"></div>
+        <div><b>Marine Agent</b><span>NOBLE ARCHITECTURE</span></div>
+      </div>
+      <div class="hd-right">
+        <span class="pill">ACCESSIBILITY FIRST</span>
+        <button class="btn primary" id="startBtn">Start a project</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="hero" id="hero">
+    <div class="hero-orb"></div>
+    <div class="eyebrow">AI AGENTS FOR ACCESSIBLE YACHT DEVELOPMENT</div>
+    <h1>From a sketch to a yacht<br>that <em>everyone</em> can board</h1>
+    <p>
+      Marine Agent takes you through prototype, detailed design and construction, with
+      wheelchair users, walker users and reduced mobility treated as the design baseline rather than
+      a retrofit. Pick a stage below.
+    </p>
+    <div style="display:flex;gap:10px;justify-content:center;margin-top:24px;flex-wrap:wrap">
+      <button class="btn primary" id="journeyBtn" style="padding:13px 24px;font-size:15px">▶ Watch the full journey</button>
+      <span class="pill" style="align-self:center">5 LIVE DEMOS · PLAY, STEP OR SKIP</span>
+    </div>
+  </div>
+
+  <div class="tabs" id="tabs"></div>
+
+  <div class="searchbar">
+    <input id="search" placeholder="Search every step, deliverable, role and requirement" autocomplete="off">
+    <span class="cnt" id="cnt"></span>
+  </div>
+
+  <div class="chips" id="chips"></div>
+
+  <div class="stage" id="stage"></div>
+
+  <footer>
+    <div class="foot">
+      <span>MARINE AGENT · NOBLE ARCHITECTURE</span>
+      <span>FIGURES ARE PLANNING ESTIMATES FOR DISCUSSION, NOT QUOTATIONS</span>
+    </div>
+  </footer>
+</div>
+
+<script>
+/* ============================================================
+   MARINE AGENT · Noble Architecture
+   Accessible yacht development, four stages
+   Figures are planning estimates for discussion.
+   ============================================================ */
+
+const SECTIONS = [
+  { id:'proto', n:'01', t:'Prototype',        s:'Prove the concept and make it fundable' },
+  { id:'design', n:'02', t:'Detailed design', s:'Class, engineering and production drawings' },
+  { id:'agents', n:'03', t:'Agent connection',s:'Every role and the route through investors' },
+  { id:'why',    n:'04', t:'Why with us',     s:'Method, evidence and what you actually get' }
+];
+
+const D = [
+
+/* ==================== 01 · PROTOTYPE ==================== */
+{sec:'proto', t:'Mission profile and owner brief',
+ q:'Where do we even start? We have an idea and no drawings.',
+ k:['start','brief','mission','concept','idea','first step','begin'],
+ src:['OWNER INTERVIEW','ACCESSIBILITY PANEL','OPERATING AREA'],
+ lead:'Before any line is drawn we fix five numbers. Every later decision, and every pound of cost, traces back to them.',
+ type:'brief',
+ data:{
+  rows:[
+   ['Who sails, and how', 'Owner is a wheelchair user and intends to helm independently. Guests include ambulant disabled, walker users and children.', 'Drives single level layout, helm transfer, lift strategy'],
+   ['People on board', '12 guests plus 4 crew. Staying at or under 12 keeps you in REG Yacht Code Part A.', 'Above 12 you become a passenger yacht under Part B, a different regime'],
+   ['Length and platform', '24m to 26m catamaran. Length over 24m load line triggers the Code.', 'Beam is the accessibility asset, not the length'],
+   ['Operating area', 'Mediterranean summer, Caribbean winter, unrestricted ocean passage.', 'Sets stability standard, range, redundancy'],
+   ['Use', 'Private with limited charter, or non profit programme operation.', 'Changes flag, class, VAT and insurance entirely']
+  ],
+  cards:[
+   {l:'DECISION HORIZON',v:'4-6 weeks',s:'Concept brief to signed scope'},
+   {l:'TYPICAL SPEND',v:'£25-60k',s:'Concept phase, not build'},
+   {l:'WHAT YOU HOLD',v:'3 documents',s:'Brief, sketch GA, cost envelope'}
+  ],
+  warn:'The single most expensive mistake in accessible yachts is deciding the platform before deciding the people. Changing from monohull to catamaran after structural design has started costs six figures and months.'
+ },
+ ins:'Notice that passenger count is a regulatory decision, not a hospitality one. Thirteen guests instead of twelve moves you from Part A to Part B of the REG Yacht Code, which brings passenger ship subdivision and damage stability with it. That one seat can add a year.'},
+
+{sec:'proto', t:'Catamaran or monohull',
+ q:'Why a catamaran? Would a monohull be cheaper?',
+ k:['catamaran','monohull','platform','hull','cheaper','which boat','multihull'],
+ src:['NAVAL ARCHITECTURE','ACCESSIBILITY REVIEW','COST MODEL'],
+ lead:'A monohull is usually cheaper per metre. For a wheelchair accessible yacht it is almost always more expensive overall, because you spend the saving fighting the geometry.',
+ type:'matrix',
+ data:{
+  head:['','Catamaran','Monohull'],
+  rows:[
+   ['Single level living','Natural. Bridgedeck gives one flat plane across the full beam',{v:'Needs a lift between decks in almost every case',t:'bad'}],
+   ['Usable beam at 24m','10.5m to 11m. Turning circles and 1200mm corridors are affordable',{v:'6m to 6.5m. Every corridor competes with cabins',t:'bad'}],
+   ['Heel under sail','Typically under 8 degrees. A chair stays controllable',{v:'20 to 30 degrees. Unmanageable for most chair users',t:'bad'}],
+   ['Motion at anchor','Low roll, the comfort case for guests who cannot brace',{v:'Rolls. Often the reason guests stop coming',t:'bad'}],
+   ['Hull to hull access',{v:'Requires two lifts or a full width bridgedeck layout',t:'warn'},'Not applicable'],
+   ['Marina cost','Higher. Often 1.5 to 1.75 times the monohull rate','Standard'],
+   ['Build cost per metre','Higher structure cost, lower adaptation cost','Lower structure cost, high adaptation cost'],
+   ['Resale market','Narrower buyer pool','Broader buyer pool']
+  ],
+  verdict:{t:'Recommendation',d:'Catamaran, and the deciding factor is heel rather than space. Space can be bought on a monohull by making the yacht longer. Heel cannot be bought out at all, and a yacht that heels 25 degrees is not accessible at any length.'},
+  cards:[
+   {l:'BEAM AT 24M',v:'10.8m',s:'Catamaran, versus 6.2m monohull'},
+   {l:'HEEL UNDER SAIL',v:'<8°',s:'Chair remains controllable'},
+   {l:'LEVEL DECK AREA',v:'~95 m²',s:'Single plane, no steps'}
+  ]
+ },
+ ins:'The Impossible Dream, launched in 2002 and still the reference point for this category, is a 58 to 60 foot catamaran. Its designer and owner reached the same conclusion we do, and two decades of operation have not produced a monohull that matches it.'},
+
+{sec:'proto', t:'The accessibility baseline',
+ q:'What exactly makes a yacht accessible? Give me the real numbers.',
+ k:['accessible','accessibility','wheelchair','standard','dimensions','universal design','disabled','walker'],
+ src:['ISO 21542','ADA PVAG','EN 17210','LIVED EXPERIENCE PANEL'],
+ lead:'There is no yacht specific accessibility code. We therefore build a project standard from land and passenger vessel standards, and write it into the contract so the yard is bound by it.',
+ type:'spec',
+ data:{
+  groups:[
+   {t:'Circulation',items:[
+    ['Clear corridor width','1200 mm','Two people pass, one seated. 900 mm is a legal minimum on land and is not enough at sea'],
+    ['Turning circle','1500 mm','In every cabin, head and at every route end'],
+    ['Door clear opening','900 mm','Measured clear of the open leaf, not the frame'],
+    ['Threshold height','0 mm internal','The hard one. Watertight doors normally need a coaming'],
+    ['Ramp gradient','1:12 maximum','With level landings every 9 m'],
+    ['Side deck clear width','1100 mm','Both sides, uninterrupted by winches or cleats']
+   ]},
+   {t:'Transfer and reach',items:[
+    ['Counter and galley height','850 mm','With 700 mm clear knee recess beneath'],
+    ['Control and switch height','900-1100 mm','Including engine start, winch and nav controls'],
+    ['Helm seat','Transfer or drive on','Owner helms from the chair or transfers across'],
+    ['Berth height','500 mm','Matches most chair seat heights for lateral transfer'],
+    ['Hoist provision','Ceiling track','Cabin to head, and cockpit to tender']
+   ]},
+   {t:'Heads and wet areas',items:[
+    ['Type','Level access wetroom','No shower tray lip anywhere on board'],
+    ['Transfer space','900 mm beside WC','Clear, one side minimum, both preferred'],
+    ['Grab rails','Fixed and drop down','Contrast coloured against the wall'],
+    ['Emergency call','In every head','Reachable from the floor']
+   ]},
+   {t:'Sensory and cognitive',items:[
+    ['Visual contrast','LRV difference 30+','Between floor, wall, door and handle'],
+    ['Alarms','Audible and visual','Deaf guests must see the general alarm'],
+    ['Signage','Tactile and braille','At consistent height throughout'],
+    ['Hearing support','Induction loop','Saloon and helm position']
+   ]}
+  ],
+  warn:'The zero threshold requirement is the single hardest item on this list, because watertight and weathertight doors are normally built with a coaming. It is solvable with drop sills, drainage channels and recessed door pans, but it must be engineered at structural design stage, not chosen from a catalogue later.'
+ },
+ ins:'Write these numbers into the build contract as a schedule, with a named accessibility consultant holding sign off at each stage. A yard that agrees to "wheelchair friendly" in an email will deliver a 780 mm door and be contractually correct.'},
+
+{sec:'proto', t:'Concept general arrangement',
+ q:'Show me what the layout actually looks like.',
+ k:['layout','arrangement','ga','plan','deck','rooms','cabins'],
+ src:['CONCEPT GA REV C','CIRCULATION STUDY','PANEL REVIEW'],
+ lead:'Main deck, single plane, no steps anywhere in the guest route. The two hulls hold machinery, crew and storage, reached by lift when guests need them.',
+ type:'deck',
+ data:{
+  cards:[
+   {l:'LOA',v:'24.8 m',s:'Load line length 24m+'},
+   {l:'BEAM',v:'10.8 m',s:'Full accessible width'},
+   {l:'GUESTS',v:'12',s:'4 accessible cabins'},
+   {l:'STEP FREE ROUTE',v:'100%',s:'Of the guest areas'}
+  ],
+  notes:[
+   ['Foredeck lounge','Reached by a 1:14 ramp from the saloon, no step at the door. Recessed drain channel replaces the coaming.'],
+   ['Saloon and galley','850 mm counters with knee recess. Island removed so the turning circle is clear.'],
+   ['Helm station','Inboard and at deck level. Chair rolls straight in, or the owner transfers to a fixed seat.'],
+   ['Accessible cabins','Two on the main deck, two in the hulls via lift. 1500 mm turning circle beside each berth.'],
+   ['Lifts','One per hull. Platform type, 1100 x 1400 mm, with manual lowering on power loss.'],
+   ['Bathing platform','Hydraulic, lowers below the waterline. Hoist track for transfer into the water or the tender.']
+  ],
+  warn:'The two lifts are the biggest single accessibility cost on the vessel and the biggest maintenance liability. The layout deliberately puts the main social spaces and two cabins on one level so that a lift failure never traps a guest away from the saloon, a head or the exit.'
+ },
+ ins:'Look at where the helm sits. Most accessible refits park the chair behind the wheel as an afterthought. Putting the helm inboard at deck level during concept costs nothing, and it is the difference between an owner who is sailed and an owner who sails.'},
+
+{sec:'proto', t:'What a prototype actually is',
+ q:'What do we build first? A model, a mock up, software?',
+ k:['prototype','model','mock up','mockup','vr','test','build first'],
+ src:['PROTOTYPING PLAN','COST MODEL','USER TESTING'],
+ lead:'A yacht prototype is not a small yacht. It is the three artefacts that let an investor and a disabled user believe the thing before it exists.',
+ type:'proto',
+ data:{
+  options:[
+   {n:'1:1 cabin and head mock up',cost:'£18-35k',time:'5-7 weeks',best:true,
+    what:'Plywood and foam, full size, one accessible cabin plus its wetroom, built in a workshop.',
+    why:'This is the one that changes minds. Users roll in and find the problems in ten minutes that drawings hide for a year.',
+    gives:['Validated door, turning and transfer dimensions','Film of real users, which is your fundraising asset','A punch list of errors found before they cost money']},
+   {n:'VR walkthrough of the full GA',cost:'£12-25k',time:'4-6 weeks',
+    what:'Navigable model at eye height for a seated user, not a standing one.',
+    why:'Remote investors and a geographically spread user panel can review without travel.',
+    gives:['Seated sightline check from every position','Investor material that survives being emailed','Cheap iteration before mock up']},
+   {n:'Scale hull model and tank or CFD',cost:'£20-45k',time:'8-12 weeks',
+    what:'Resistance, motion and seakeeping validation.',
+    why:'Motion comfort is an accessibility requirement here, not a luxury. It needs numbers.',
+    gives:['Power and range confirmed','Motion predicted in realistic sea states','Evidence class and investors both accept']},
+   {n:'Systems rig for the lift and hoist',cost:'£15-30k',time:'6-8 weeks',
+    what:'Bench rig of the platform lift, hoist track and manual lowering.',
+    why:'These are the components that fail, and marine lift suppliers are few.',
+    gives:['Supplier shortlist proven, not promised','Failure modes understood early','Maintenance plan grounded in reality']}
+  ],
+  rec:'Run the cabin mock up and the VR together. Together they cost under £60k, they take about two months, and they produce the footage that makes the rest of the money raisable.'
+ },
+ ins:'The mock up is a fundraising instrument disguised as an engineering exercise. A thirty second clip of a wheelchair user rolling unaided into a shower on a yacht does more in an investor meeting than forty pages of specification.'},
+
+{sec:'proto', t:'Prototype budget and the ask',
+ q:'What does the prototype stage cost and what do we raise?',
+ k:['cost','budget','price','how much','raise','funding','ask','money'],
+ src:['COST MODEL','COMPARABLES','GRANT DATABASE'],
+ lead:'Stage one is deliberately small. You are buying the right to ask for the big money, and nothing more.',
+ type:'cost',
+ data:{
+  total:'£295k',
+  totalLabel:'Stage 1 total, concept through validated prototype',
+  lines:[
+   ['Concept design and mission brief','£45k',15],
+   ['Preliminary naval architecture','£60k',20],
+   ['Accessibility standard and user panel','£28k',10],
+   ['1:1 cabin and head mock up','£32k',11],
+   ['VR walkthrough','£18k',6],
+   ['CFD and motion study','£38k',13],
+   ['Lift and hoist systems rig','£24k',8],
+   ['Regulatory feasibility, class and flag','£22k',7],
+   ['Project management and contingency','£28k',10]
+  ],
+  sources:[
+   {n:'Impact and angel investment',v:'£150k',d:'Lead investor with disability or marine interest',t:'ok'},
+   {n:'Innovation and accessibility grants',v:'£75k',d:'Non dilutive. Longer lead time, start early',t:'sky'},
+   {n:'Founder and owner contribution',v:'£50k',d:'Signals commitment to every other funder',t:'ok'},
+   {n:'In kind from suppliers',v:'£20k',d:'Lift and hardware makers want the reference case',t:'warn'}
+  ],
+  note:'Stage 2, detailed design and class approval, typically runs £0.9m to £1.6m. Stage 3, the build of a 24m accessible catamaran, sits in the £6m to £11m range depending on yard, propulsion and finish level. Those are planning ranges for discussion, not quotations.'
+ },
+ ins:'Split the raise. Asking for £9m with a sketch fails. Asking for £295k with a defined deliverable, then returning with film of users and a class feasibility letter, changes the second conversation completely.'},
+
+{sec:'proto', t:'Co-design with disabled users',
+ q:'How do we involve disabled people properly rather than as a token?',
+ k:['users','co-design','panel','disabled','consult','testing','lived experience'],
+ src:['PANEL CHARTER','SESSION PLAN','ETHICS'],
+ lead:'A panel that reviews finished drawings is decoration. A panel with budget, a veto on defined items and payment for their time is design input.',
+ type:'panel',
+ data:{
+  members:[
+   ['Manual wheelchair user','Self propelling. Tests every gradient, coaming and door width the hard way.'],
+   ['Power wheelchair user','150 to 200 kg of chair. Drives lift sizing, deck loading and turning circles.'],
+   ['Walker and stick user','Needs handholds and rest points, not ramps. The group most often forgotten.'],
+   ['Blind or low vision guest','Contrast, tactile wayfinding, audible alarm. Costs almost nothing if designed in.'],
+   ['Deaf guest','Visual alarm and emergency communication. A safety requirement, not a comfort one.'],
+   ['Occupational therapist','Translates lived experience into dimensions the naval architect can use.'],
+   ['Carer or companion','Space for two people in a head is a different number from space for one.']
+  ],
+  gates:[
+   {g:'Concept GA',v:'Advisory',d:'Panel comments, designer decides'},
+   {g:'Accessibility standard',v:'Veto',d:'No sign off, no progression'},
+   {g:'Cabin mock up',v:'Veto',d:'Physical test, pass or redesign'},
+   {g:'Production drawings',v:'Advisory',d:'Spot check against the standard'},
+   {g:'Sea trials',v:'Veto',d:'Real conditions, real users'}
+  ],
+  pay:'Panel members are paid at a professional consulting rate. Travel and personal assistance costs are covered as a budget line, not expected as a favour.'
+ },
+ ins:'The two veto gates are what make this real. A panel with opinions and no authority produces a yacht with a lowered counter and a 780 mm bathroom door. Give the standard and the mock up a hard pass or fail, and the geometry gets fixed while it is still cheap.'},
+
+{sec:'proto', t:'Risk register',
+ q:'What is most likely to kill this project?',
+ k:['risk','what could go wrong','fail','problem','threat','danger'],
+ src:['RISK WORKSHOP','YARD HISTORY','CLASS PRECEDENT'],
+ lead:'Seven risks carry the project. Four are manageable with money, three need a decision before you spend anything serious.',
+ type:'risk',
+ data:{
+  rows:[
+   ['Zero threshold versus watertight integrity','High','High','Engineer drop sills and drainage at structural stage. Get class to review the detail before production drawings.','red'],
+   ['Lift reliability and marine suppliers','High','Med','Bench rig in prototype. Two approved suppliers. Manual lowering mandatory. Spares on board.','red'],
+   ['Weight growth eroding stability','Med','High','Weight control engineer from day one, monthly budget, 8% margin held to delivery.','red'],
+   ['Yard has never built accessible','High','Med','Accessibility schedule in the contract with hold points and named sign off authority.','amber'],
+   ['Funding gap between stages','Med','High','Stage gate the raise. Never start stage 2 without stage 3 investors in diligence.','amber'],
+   ['Crossing 12 passengers late','Low','High','Fix the number in the brief. Moving to Part B after structural design restarts stability work.','amber'],
+   ['Insurance and charter classification','Med','Med','Engage a specialist broker at concept, not at launch. Non standard vessels surprise underwriters.','green']
+  ],
+  note:'Probability and impact are our assessment at concept stage and are reviewed monthly.'
+ },
+ ins:'The first three share a root cause: they are all decided by the naval architect and structural engineer in the first ninety days, and all become near impossible to fix after tooling. That is the real argument for spending properly on stage one.'},
+
+/* ==================== 02 · DETAILED DESIGN ==================== */
+{sec:'design', t:'Class and flag strategy',
+ q:'Which rules apply and who signs off?',
+ k:['class','flag','rules','regulation','code','compliance','certification','reg','survey'],
+ src:['REG YACHT CODE','CLASS RULES','FLAG GUIDANCE'],
+ lead:'Two separate authorities. Class approves how the yacht is built, flag approves that it may operate. You need both, and you choose them before detailed design, not after.',
+ type:'class',
+ data:{
+  cards:[
+   {l:'CODE',v:'REG Part A',s:'24m+, up to 12 passengers'},
+   {l:'CLASS',v:'Shortlist of 3',s:'Lloyd\u2019s, DNV, RINA'},
+   {l:'FLAG',v:'Red Ensign',s:'Cayman, Malta or Isle of Man'},
+   {l:'APPROVAL',v:'14-20 weeks',s:'Plan approval, run in parallel'}
+  ],
+  codes:[
+   {n:'REG Yacht Code Part A',a:'Applies',d:'Yachts 24m and over in load line length, commercial use for sport or pleasure, no cargo, not more than 12 passengers. This is the update to the old Large Yacht Code LY3.',t:'ok'},
+   {n:'REG Yacht Code Part B',a:'Avoid',d:'Pleasure yachts carrying more than 12 but not more than 36 passengers. Passenger ship subdivision and damage stability. Significant cost and schedule impact.',t:'warn'},
+   {n:'Load Line and SOLAS equivalence',a:'Applies',d:'The Code operates as an equivalence under the Load Line Convention and SOLAS. Class verifies, flag accepts.',t:'ok'},
+   {n:'MARPOL',a:'Applies',d:'Sewage, oil, garbage and emissions. Drives tankage and treatment selection.',t:'ok'},
+   {n:'MLC',a:'If commercial',d:'Crew accommodation standards. Interacts with layout because crew space competes with accessible space.',t:'sky'},
+   {n:'Accessibility',a:'No marine code',d:'No yacht specific accessibility standard exists. We write a project standard from ISO 21542, ADA passenger vessel guidelines and EN 17210, then have class witness compliance as a contractual item.',t:'bad'}
+  ],
+  warn:'This is the point most owners misunderstand. Class will not fail your yacht for having a 700 mm bathroom door, because no rule says it should. Accessibility is enforced only by your own contract and your own consultant. If you do not create that mechanism, nobody is checking.'
+ },
+ ins:'Put the accessibility schedule inside the class surveyor\u2019s witness list as a commercial instruction. The surveyor is on board anyway, is independent, and has authority the yard already respects. It costs very little and turns your standard into something inspected.'},
+
+{sec:'design', t:'Structure and the threshold problem',
+ q:'How do you get a flat floor through a watertight door?',
+ k:['structure','threshold','coaming','watertight','door','step','flat floor','scantlings'],
+ src:['STRUCTURAL CALC','CLASS RULE CHECK','DETAIL LIBRARY'],
+ lead:'This is the defining engineering problem of an accessible yacht. A weathertight door normally sits on a raised coaming. A wheelchair needs no coaming at all. Both can be satisfied, with three details.',
+ type:'detail',
+ data:{
+  solutions:[
+   {n:'Recessed pan and drainage channel',use:'Main deck to cockpit, foredeck access',
+    how:'The deck is locally lowered into a shallow pan under the door. A grated channel across the opening drains to scuppers through non return valves. Finished floor is continuous and flat.',
+    cost:'££',risk:'Needs class review of the pan structure and drainage capacity. Proven on expedition yachts.'},
+   {n:'Drop down automatic sill',use:'Weathertight internal to external doors',
+    how:'Sill retracts into the deck as the door opens and seals upward when closed. Marine versions exist from building industry suppliers with marinisation.',
+    cost:'£££',risk:'Moving part exposed to salt. Specify manual override and a seal replacement schedule.'},
+   {n:'Ramped transition at 1:20',use:'Where a coaming is unavoidable for watertight subdivision',
+    how:'A gentle local ramp absorbs the step height over a longer run, with a level landing each side.',
+    cost:'£',risk:'Eats floor length. Only acceptable where it does not reduce a turning circle.'}
+  ],
+  struct:[
+   ['Construction','Composite sandwich, vacuum infused','Weight critical because lifts, hoists and reinforcement all add'],
+   ['Deck loading','Local reinforcement under lift and hoist tracks','Power chairs reach 200 kg before the occupant'],
+   ['Hoist track structure','Tied into deck beams, not the headlining','A ceiling hoist pulling out of a liner is a serious injury'],
+   ['Weight margin','8% held to delivery','Accessible fit out historically overruns weight'],
+   ['Lift shaft','Structural trunk, both hulls','Interacts with watertight subdivision, resolve early']
+  ]
+ },
+ ins:'Resolve the threshold details before the structural model is frozen. Every one of these three solutions changes deck structure locally. Discovering the problem during fit out means cutting into a finished composite deck, which is the most expensive sentence in yacht building.'},
+
+{sec:'design', t:'Lifts, hoists and water access',
+ q:'How do people actually get between decks and into the water?',
+ k:['lift','elevator','hoist','water access','swimming','tender','transfer','platform'],
+ src:['SUPPLIER SURVEY','LIFT ENGINEERING','SAFETY CASE'],
+ lead:'Four transfer points define the experience. Each needs a primary method, a backup, and a plan for when the power fails.',
+ type:'transfer',
+ data:{
+  points:[
+   {n:'Dock to deck',p:'Passerelle at 1:12 with handrails both sides, self levelling in tide',
+    b:'Portable ramp carried on board for difficult berths',
+    f:'Crew assisted transfer. Never the primary plan.',
+    note:'Hardest point in the whole chain, because it depends on a marina you do not control.'},
+   {n:'Deck to hull',p:'Platform lift, 1100 x 1400 mm, one per hull',
+    b:'Manual lowering by hand pump, no power required',
+    f:'Guest routes are planned so a lift failure never isolates anyone from a saloon, head or exit.',
+    note:'Specify 250 kg minimum. A power chair plus occupant plus a carer exceeds domestic lift ratings.'},
+   {n:'Cabin to head',p:'Ceiling track hoist, continuous from berth to shower seat',
+    b:'Mobile hoist stowed in the cabin',
+    f:'Track is structural. Battery hoist with manual descent.',
+    note:'The detail that decides whether a guest travels with a carer or independently.'},
+   {n:'Deck to water or tender',p:'Hydraulic bathing platform lowering below the waterline',
+    b:'Davit mounted hoist with a sling seat',
+    f:'Platform holds at the last position on power loss and can be raised manually.',
+    note:'The emotional centre of the whole yacht. This is what guests remember.'}
+  ],
+  warn:'Specify every powered transfer device with a mechanical backup that works with the batteries flat and the engines off. A guest stuck in a hull because a lift has no manual override is both a safety event and the end of the project\u2019s reputation.'
+ },
+ ins:'The bathing platform is where accessibility stops being compliance and becomes the reason the yacht exists. Budget it as a headline feature rather than an auxiliary system, because it is the one your guests will describe to other people.'},
+
+{sec:'design', t:'Evacuation and safety for reduced mobility',
+ q:'How do you evacuate someone who cannot walk, at night, in a seaway?',
+ k:['evacuation','safety','emergency','fire','abandon','muster','escape','life raft'],
+ src:['SAFETY CASE','REG CODE','FLAG CONSULTATION'],
+ lead:'The Code sets escape route requirements written for people who can climb a ladder. Our safety case has to go further, and flag will want to see it before it accepts the arrangement.',
+ type:'safety',
+ data:{
+  measures:[
+   {t:'Two independent escape routes per accessible cabin',d:'One must be navigable seated. A vertical ladder as a second escape route does not count for this vessel.',s:'Designed'},
+   {t:'Muster station on the accessible level',d:'No guest should need a lift to reach muster. Main deck aft, under cover, step free.',s:'Designed'},
+   {t:'Evacuation chairs at both lift positions',d:'For the case where power is lost and a guest is below.',s:'Specified'},
+   {t:'Liferaft boarding at deck level',d:'Davit launched raft boarded from a level platform, not a jumping deck.',s:'Specified'},
+   {t:'Visual plus audible general alarm',d:'Strobes in every cabin and head. Deaf guests must see the alarm.',s:'Designed'},
+   {t:'Two way emergency call in every head and cabin',d:'Reachable from floor level after a fall.',s:'Designed'},
+   {t:'Crew training and drill regime',d:'Every crew member trained in transfer and evacuation technique, drilled monthly with weighted dummies.',s:'Procedural'},
+   {t:'Personal emergency evacuation plan per guest',d:'Completed at boarding, held at the helm and the muster station.',s:'Procedural'}
+  ],
+  note:'Agree this safety case with flag in writing during detailed design. It is an equivalence argument, and equivalence arguments are far cheaper to win on paper than after the yacht is built.'
+ },
+ ins:'This section is also the strongest fundraising material you have. It shows investors and partners that accessibility here is engineering with a safety case behind it, and not a marketing adjective. Most competitors cannot produce this document.'},
+
+{sec:'design', t:'Systems, power and motion comfort',
+ q:'What propulsion and systems suit this yacht?',
+ k:['propulsion','engine','electric','hybrid','power','systems','hvac','noise','stabilizer','motion'],
+ src:['SYSTEMS DESIGN','POWER BUDGET','NOISE STUDY'],
+ lead:'Accessibility changes the systems brief in ways people do not expect. Lifts and hoists add load, and motion comfort stops being a luxury metric.',
+ type:'systems',
+ data:{
+  rows:[
+   ['Propulsion','Serial hybrid, twin electric drives with diesel generators','Silent operation at anchor, no vibration through hoist tracks, and torque control for low speed manoeuvring'],
+   ['House load','Elevated. Two lifts, hoists, platform and HVAC','Lift motors are intermittent but high peak. Size the bank for peaks, not averages'],
+   ['Energy storage','Lithium bank with a dedicated reserve','A ring fenced reserve guarantees lift and hoist operation even at low state of charge'],
+   ['Motion control','Gyro or fin stabilisation, at anchor and underway','Here this is an accessibility system. A guest who cannot brace needs lower roll acceleration'],
+   ['HVAC','Zoned, low velocity','Guests with limited mobility or spinal injury regulate temperature differently. Per cabin control matters'],
+   ['Noise and vibration','Target 45 dB(A) in cabins','Hoist tracks transmit structure borne noise. Isolate mounts at design stage'],
+   ['Redundancy','Two independent power paths to all transfer equipment','A single failure must never strand a guest']
+  ],
+  cards:[
+   {l:'TARGET RANGE',v:'2,400 nm',s:'At 9 knots, hybrid'},
+   {l:'SILENT AT ANCHOR',v:'10 h',s:'Full hotel load, no generator'},
+   {l:'LIFT RESERVE',v:'Ring fenced',s:'Guaranteed regardless of charge'},
+   {l:'CABIN NOISE',v:'45 dB(A)',s:'Design target underway'}
+  ]
+ },
+ ins:'Thermoregulation is the requirement nobody writes down. Many people with spinal cord injury cannot regulate body temperature normally, so per cabin climate control is a medical necessity on this yacht rather than a comfort upgrade. It belongs in the specification, not the options list.'},
+
+{sec:'design', t:'Build programme and stage gates',
+ q:'How long does the whole thing take?',
+ k:['timeline','schedule','how long','programme','gantt','phases','duration','when'],
+ src:['MASTER SCHEDULE','YARD CAPACITY','CLASS TIMELINE'],
+ lead:'Concept to delivery is realistically 40 to 52 months for a one off 24m accessible catamaran. The build itself is less than half of it.',
+ type:'timeline',
+ data:{
+  phases:[
+   {n:'Concept and prototype',d:'Months 1-7',s:'done',w:'Brief, sketch GA, mock up, user validation, cost envelope'},
+   {n:'Funding, stage 2',d:'Months 5-10',s:'now',w:'Runs in parallel. Never let design stop while money is raised'},
+   {n:'Basic design and class approval',d:'Months 8-18',s:'',w:'Lines, structure, stability, systems schematics, plan approval'},
+   {n:'Yard selection and contract',d:'Months 15-20',s:'',w:'Tender, technical negotiation, accessibility schedule annexed'},
+   {n:'Detailed and production design',d:'Months 18-30',s:'',w:'Production drawings, 3D model, procurement of long lead items'},
+   {n:'Construction',d:'Months 24-44',s:'',w:'Hull, structure, systems, fit out. Overlaps design by design'},
+   {n:'Commissioning and trials',d:'Months 44-49',s:'',w:'Harbour trials, sea trials, accessibility validation with real users'},
+   {n:'Delivery and first season',d:'Months 49-52',s:'',w:'Flag registration, crew training, warranty period begins'}
+  ],
+  leads:[
+   ['Platform lifts','9-12 months','Order at contract signature, not at fit out'],
+   ['Hybrid drive and batteries','8-10 months','Class approval of the installation adds time'],
+   ['Hydraulic bathing platform','6-9 months','Custom geometry, long engineering lead'],
+   ['Stabilisers','7-10 months',''],
+   ['Glazing','6-8 months','Large panes with low sills for seated sightlines']
+  ],
+  warn:'The lifts are the critical path item that catches first time owners. They are low volume marine products from a small number of suppliers, and a late order can hold a finished yacht in the shed for three months.'
+ },
+ ins:'Notice the overlap between funding and design. Owners who stop design work while they raise money lose six to nine months and usually lose their design team as well, because the team takes other work. Budget a reduced but continuous design spend through the raise.'},
+
+{sec:'design', t:'Deliverables at each stage',
+ q:'What documents do we actually receive?',
+ k:['deliverables','documents','drawings','what do we get','output','package'],
+ src:['SCOPE OF WORK','CLASS SUBMISSION LIST'],
+ lead:'Every stage ends with a defined package. If a designer cannot list these, they are not scoping the work properly.',
+ type:'deliv',
+ data:{
+  stages:[
+   {n:'Concept',items:['Owner brief and mission profile','Sketch general arrangement','Accessibility project standard','Styling concept, exterior and interior','Preliminary weight and cost envelope','Regulatory feasibility note']},
+   {n:'Basic design',items:['Lines plan and hull definition','Hydrostatics and preliminary stability','Structural scantlings for class','Systems schematics, all disciplines','Weight estimate with margins','General arrangement for approval','Class plan approval submission']},
+   {n:'Detailed and production',items:['Full 3D model and digital twin','Production drawings, structure and outfit','Accessibility compliance matrix, item by item','Equipment schedules and specifications','Wiring and piping routing','Interior construction drawings','Build specification annexed to contract']},
+   {n:'Construction support',items:['Shop drawing review','Site inspection reports and hold points','Change control register','Weight tracking against budget','Accessibility hold point sign offs']},
+   {n:'Delivery',items:['Stability booklet, approved','Operating and maintenance manuals','Accessibility operations guide for crew','As built drawings','Trials report including user validation']}
+  ]
+ },
+ ins:'The accessibility compliance matrix in the third package is the document that distinguishes this process. It lists every requirement from the project standard against a drawing reference and a sign off. Without it, accessibility is an intention. With it, it is auditable.'},
+
+/* ==================== 03 · AGENT CONNECTION ==================== */
+{sec:'agents', t:'Connect your project team',
+ q:'Who do I actually need, and when?',
+ k:['team','roles','who','hire','agents','connect','people','positions','jobs','staff'],
+ src:['ROLE LIBRARY','PHASE MAPPING'],
+ lead:'Thirty one roles build an accessible yacht. You do not need them at once. Connect an agent and it joins the project with its own brief, its own deliverables and its own hold points.',
+ type:'agents',
+ data:{note:'Toggle a role to connect it. Connected roles appear in the project plan, the RACI and the cost model.'},
+ ins:'The three roles that owners leave out, and then pay for later, are the weight control engineer, the accessibility consultant with sign off authority, and the owner\u2019s representative. Each is a small fee that protects a very large one.'},
+
+{sec:'agents', t:'The route through investors',
+ q:'How do we actually get funded, stage by stage?',
+ k:['investors','funding','raise','capital','money','vc','grants','finance','fundraising'],
+ src:['FUNDING MODEL','COMPARABLE RAISES','GRANT CALENDAR'],
+ lead:'Five gates. Each one is a different investor with a different question, and the mistake is pitching all five the same deck.',
+ type:'invest',
+ data:{
+  gates:[
+   {n:'Gate 0 · Founder and friends',amt:'£50-80k',who:'Owner, family, close network',
+    ask:'Prove you are serious',give:'Concept brief, sketch GA, a named design team',
+    q:'Is there a real person behind this and have they put their own money in?',s:'done'},
+   {n:'Gate 1 · Angels and impact',amt:'£250-400k',who:'Angels with marine or disability interest, small impact funds',
+    ask:'Fund the prototype',give:'Validated mock up, user footage, class feasibility letter, cost envelope',
+    q:'Can this be built, and will disabled people actually want it?',s:'now'},
+   {n:'Gate 2 · Grants and foundations',amt:'£75-500k',who:'Innovation agencies, accessibility and disability foundations, maritime decarbonisation funds',
+    ask:'Non dilutive match funding',give:'Impact model, measurable outcomes, published design standard',
+    q:'Does this create public benefit we can point to?',s:''},
+   {n:'Gate 3 · Build finance',amt:'£6-11m',who:'Family offices, marine mortgage lenders, blended finance, syndicates',
+    ask:'Fund construction',give:'Yard contract, class approval, fixed price, refund guarantees, charter model',
+    q:'Is my capital secured against a real asset with a real exit?',s:''},
+   {n:'Gate 4 · Operating capital',amt:'£400-900k',who:'Charter operators, sponsors, programme partners, membership',
+    ask:'Fund the first two seasons',give:'Booking pipeline, crew, operating licences, insurance',
+    q:'Does it pay for itself once it floats?',s:''}
+  ],
+  room:['Concept brief and mission profile','Sketch GA and styling','Accessibility project standard','User validation footage and panel report','Class and flag feasibility correspondence','Cost model with stage breakdown','Programme with critical path','Risk register','Team CVs and role coverage','Comparable vessel analysis','Impact model and measurement plan','Revenue model and sensitivity','Cap table and use of funds'],
+  warn:'Do not approach Gate 3 before Gate 1 has produced physical evidence. Build finance investors are asset backed lenders at heart, and a concept without a yard contract and class approval has no asset to secure against.'
+ },
+ ins:'Gate 2 is the one most owners skip and it is often the cheapest money in the project. Accessibility and marine innovation grants are non dilutive, they validate you to commercial investors, and the application itself forces the impact discipline that Gate 3 will demand anyway. Start those applications nine months before you need the cash.'},
+
+{sec:'agents', t:'Who decides what',
+ q:'Who has authority over which decision?',
+ k:['raci','authority','decides','responsibility','sign off','approval','governance'],
+ src:['RACI MATRIX','CONTRACT STRUCTURE'],
+ lead:'Most yacht projects go wrong at the boundaries between the owner, the yard and the design team. Fix the boundaries in writing before the contract is signed.',
+ type:'raci',
+ data:{
+  head:['Decision','Decides','Consulted','Cannot overrule'],
+  rows:[
+   ['Mission brief and passenger number','Owner','Naval architect, flag','Anyone'],
+   ['Accessibility project standard','Accessibility consultant','User panel, owner','Yard, on cost grounds'],
+   ['Platform and hull form','Naval architect','Owner, yard','Interior designer'],
+   ['Structural scantlings','Structural engineer','Class','Owner, on aesthetic grounds'],
+   ['Stability and weight limits','Naval architect','Class, weight engineer','Owner or yard'],
+   ['Interior layout within the standard','Interior designer','Owner, accessibility consultant','Yard'],
+   ['Equipment selection','Owner\u2019s representative','Systems engineer, yard','Yard unilaterally'],
+   ['Changes during build','Owner, on written change order','PM, yard, class','Yard without an order'],
+   ['Accessibility hold point sign off','Accessibility consultant','Class surveyor','Yard or owner'],
+   ['Acceptance at delivery','Owner, on survey','Owner\u2019s rep, class, user panel','Yard']
+  ],
+  warn:'The line that matters most is row two. If the yard can overrule the accessibility standard by arguing cost, you will not get an accessible yacht. Every variation to that standard must come back to the consultant and the panel, in writing.'
+ },
+ ins:'Row nine is the mechanism that makes everything else real. An accessibility consultant with contractual hold points can stop payment milestones. One with only an advisory role sends emails that get filed.'},
+
+{sec:'agents', t:'Shipyard selection',
+ q:'How do we choose a yard and what goes in the contract?',
+ k:['shipyard','yard','builder','contract','tender','choose builder','construction'],
+ src:['YARD DATABASE','CONTRACT TEMPLATE','REFERENCE CHECKS'],
+ lead:'You are not buying boat building capacity. You are buying a yard that will accept an unfamiliar standard and be inspected against it.',
+ type:'yard',
+ data:{
+  criteria:[
+   ['Composite catamaran experience at 24m+','Critical','Multihull structure is not scaled monohull structure'],
+   ['Willingness to annex the accessibility schedule','Critical','A yard that resists this at tender will fight it for three years'],
+   ['Hold point inspection accepted','Critical','Including a consultant who is not their employee'],
+   ['Refund guarantee from a rated bank','Critical','Protects stage payments if the yard fails'],
+   ['Lift and hoist installation experience','High','Rare. Expect to bring a specialist subcontractor'],
+   ['Open book on long lead items','High','You need to see the lift order placed, not be told it was'],
+   ['Capacity in your window','High','A yard taking your job to fill a gap will deprioritise it'],
+   ['Reference owners you can call','High','Speak to the difficult projects, not the showcase ones']
+  ],
+  contract:[
+   {n:'Accessibility schedule as an annex',d:'The full project standard, item by item, as a contractual specification rather than a design intent.'},
+   {n:'Hold points with named authority',d:'Defined stages where work stops until the accessibility consultant signs. Tied to payment milestones.'},
+   {n:'Weight clause',d:'Contractual lightship weight with liquidated damages. Weight growth destroys stability and performance.'},
+   {n:'Change control',d:'No variation to the accessibility standard without written owner and consultant approval.'},
+   {n:'Refund guarantee',d:'Bank backed, covering stage payments made in advance of work.'},
+   {n:'Trials acceptance including user validation',d:'Real wheelchair users complete defined tasks at sea trials. Non negotiable acceptance criterion.'}
+  ]
+ },
+ ins:'The last item changes the whole project culture. When a yard knows that acceptance involves a wheelchair user attempting to reach the helm unaided in a seaway, accessibility stops being a drawing note and becomes something the production floor thinks about.'},
+
+/* ==================== 04 · WHY WITH US ==================== */
+{sec:'why', t:'The thesis',
+ q:'Why accessibility first? Why not just adapt a normal yacht?',
+ k:['why','thesis','accessibility first','adapt','retrofit','approach','philosophy'],
+ src:['DESIGN POSITION','PRECEDENT ANALYSIS'],
+ lead:'Adaptation and universal design produce different vessels at similar cost. One of them is good.',
+ type:'thesis',
+ data:{
+  compare:[
+   ['Starting point','Existing design, then remove barriers','Access defined before the hull form'],
+   ['Corridor width','Whatever the cabins left over','1200 mm, cabins sized around it'],
+   ['Thresholds','Ramped over, visibly added','Engineered flat into the structure'],
+   ['Lift','Shoehorned into a locker','Structural trunk, planned from frame one'],
+   ['Helm','Guest is a passenger','Owner helms from the chair'],
+   ['Appearance','Visibly adapted','Indistinguishable from any fine yacht'],
+   ['Cost','Lower design fee, higher build and rework','Higher design fee, lower build and rework'],
+   ['Resale','Narrow, visibly specialised','Broader. Ageing owners want all of it']
+  ],
+  pts:[
+   {i:'↔',t:'What helps a wheelchair user helps everyone',d:'Wide flat decks, handholds everywhere and no trip hazards are what an eighty year old owner, a parent with a toddler and a guest with a broken ankle all need.'},
+   {i:'⏳',t:'Owners age into this',d:'The typical owner of a 24m yacht is in their sixties. Knees, hips and balance change. A yacht designed for a chair today is usable for thirty years rather than twelve.'},
+   {i:'◇',t:'Universal design is better design',d:'Constraints produce clarity. Single level living, generous circulation and reachable controls read as luxury, not as medical equipment.'},
+   {i:'⚑',t:'The category is close to empty',d:'Two decades after the Impossible Dream launched in 2002, it is still described as the only sailing catamaran built from the keel up to be universally accessible. That is a remarkable gap.'}
+  ]
+ },
+ ins:'The resale argument is the one that moves commercial investors. They do not need to care about accessibility to see that the buyer pool for a step free, low heel, wide deck yacht grows every year as the owner demographic ages.'},
+
+{sec:'why', t:'How we work',
+ q:'What is different about your process?',
+ k:['process','how you work','method','approach','different','way of working'],
+ src:['METHOD','ENGAGEMENT MODEL'],
+ lead:'Four commitments. Each one is a mechanism, not a value statement, and each can be checked.',
+ type:'method',
+ data:{
+  items:[
+   {i:'01',t:'The standard is written before the yacht',d:'We publish the accessibility project standard as a numbered document at concept stage, with dimensions and tolerances. It goes into the build contract as an annex. It is the reference for every later argument.',
+    proof:'Deliverable: Accessibility Project Standard, concept stage'},
+   {i:'02',t:'Disabled users hold two vetoes',d:'The panel can stop the project at the standard and at the physical mock up. They are paid professional rates and their costs are a budget line.',
+    proof:'Deliverable: Panel charter with named gates'},
+   {i:'03',t:'Agents, not a fixed team',d:'Thirty one roles are defined with briefs and deliverables. You connect the ones your stage needs and pay for those. No carrying a full studio through a slow quarter.',
+    proof:'Deliverable: Role library and phase mapping'},
+   {i:'04',t:'Funding is designed with the yacht',d:'The stage gates of the design programme are the same gates as the raise. Each design deliverable is chosen partly because it is the evidence the next investor needs.',
+    proof:'Deliverable: Funding model mapped to design stages'}
+  ],
+  honest:'What we do not do: we are not a shipyard and we do not hold build risk. We take you from idea through class approved design and into a yard contract, then supervise on your behalf. If you need a turnkey builder we will say so at the first meeting.'
+ },
+ ins:'The fourth point is the one that changes outcomes most often. Design programmes and fundraising programmes are usually run by different people on different calendars, and the project stalls in the gap between them. Running one calendar removes the gap.'},
+
+{sec:'why', t:'What it costs to work with us',
+ q:'What are your fees and what is the engagement model?',
+ k:['fees','cost of design','engagement','pricing','retainer','your price','commercial'],
+ src:['FEE SCHEDULE','INDUSTRY BENCHMARK'],
+ lead:'Design fees on a one off yacht of this size typically land between 8% and 12% of build cost. We stage it so you can stop after any gate.',
+ type:'fees',
+ data:{
+  stages:[
+   {n:'Stage 1 · Concept and prototype',fee:'£95-150k',when:'Months 1-7',
+    inc:'Mission brief, sketch GA, accessibility standard, user panel, mock up supervision, cost envelope, regulatory feasibility',
+    out:'A fundable package and a decision point'},
+   {n:'Stage 2 · Basic design and class',fee:'£280-420k',when:'Months 8-18',
+    inc:'Lines, structure, stability, systems schematics, class submission, yard tender documents',
+    out:'Class approved design and a yard contract ready to sign'},
+   {n:'Stage 3 · Detailed and production',fee:'£420-650k',when:'Months 18-30',
+    inc:'Production drawings, 3D model, compliance matrix, equipment schedules, interior construction drawings',
+    out:'A buildable package'},
+   {n:'Stage 4 · Build supervision',fee:'£18-26k / month',when:'Months 24-49',
+    inc:'Owner\u2019s representation, site inspection, hold points, change control, weight tracking, trials',
+    out:'A delivered yacht that matches the drawings'}
+  ],
+  terms:[
+   ['Stop point','End of any stage, no penalty'],
+   ['Ownership of IP','Transfers to you on payment of each stage'],
+   ['Panel costs','Separate budget line, passed through at cost'],
+   ['Travel','At cost, agreed in advance'],
+   ['Success fee','None. We are not paid on the raise']
+  ],
+  note:'Ranges depend on complexity, propulsion choice and how much of the interior is bespoke. We quote fixed price per stage after the first meeting.'
+ },
+ ins:'The reason stage 1 is small and stoppable is that it should be. If the prototype shows that the concept does not work, or the users reject the layout, finding that out for a hundred thousand rather than a million is the single most valuable thing the process does.'},
+
+{sec:'why', t:'Impact and measurement',
+ q:'How do we prove the impact to funders?',
+ k:['impact','measurement','outcomes','social','charity','funders','evidence','kpi'],
+ src:['IMPACT FRAMEWORK','GRANT REQUIREMENTS'],
+ lead:'Grant and impact funders will not accept intentions. They want a logic model with numbers you commit to before the money arrives.',
+ type:'impact',
+ data:{
+  model:[
+   ['Inputs','Capital raised, design hours, panel time, yard capacity'],
+   ['Outputs','One accessible yacht. A published design standard. Documented mock up findings.'],
+   ['Outcomes','Disabled guests sailing. Crew trained in accessible operation. Standard adopted by other projects.'],
+   ['Impact','A category that is no longer close to empty, and precedent that lowers the cost for the next build.']
+  ],
+  kpis:[
+   {k:'Disabled guests carried per season',v:'Target 300+',d:'Counted, with disability type recorded by consent'},
+   {k:'Independent tasks achievable unaided',v:'Target 85%',d:'Against a defined task list, measured at trials and annually'},
+   {k:'Guests sailing for the first time',v:'Track',d:'The strongest single number for funders'},
+   {k:'Design standard downloads and citations',v:'Track',d:'Publishing it is part of the impact, not a giveaway'},
+   {k:'Crew trained in accessible operation',v:'Track',d:'Transferable to other vessels'},
+   {k:'Cost per guest day',v:'Falling',d:'Shows the model is viable rather than charitable'}
+  ],
+  warn:'Publishing the accessibility standard openly feels counterintuitive when you have paid to develop it. It is the right move. It is the strongest grant argument you have, it establishes you as the reference in a near empty category, and nobody wins a yacht commission because of a document.'
+ },
+ ins:'The second KPI is the one to lead with. Counting guests measures activity. Measuring how many tasks a guest can complete without asking for help measures whether the design actually worked, and it is the number a design led funder will respect.'},
+
+{sec:'why', t:'Start here',
+ q:'What happens if we want to start?',
+ k:['start','next step','begin','contact','first meeting','how to start','engage'],
+ src:['ENGAGEMENT PROCESS'],
+ lead:'Four steps before any money changes hands.',
+ type:'start',
+ data:{
+  steps:[
+   {n:'Discovery call, 60 minutes',d:'Who sails, where, how many, and what the real budget horizon is. We will tell you at the end of this call if we think the project is viable.',w:'Week 1'},
+   {n:'Written feasibility note',d:'Three to five pages. Platform recommendation, regulatory route, indicative cost envelope, the three biggest risks. Free of charge.',w:'Week 2-3'},
+   {n:'Scoping workshop, one day',d:'With you, a naval architect and an accessibility consultant. Ends with a draft mission profile and a stage 1 fixed price.',w:'Week 4'},
+   {n:'Stage 1 begins',d:'Fixed price, defined deliverables, stop point at the end. First panel session within three weeks.',w:'Week 6'}
+  ],
+  bring:['Who will be on board, including specific access needs','Where you want to sail and for how long each year','Private, charter or programme operation','Budget range and funding you already have','Any existing drawings, even sketches'],
+  honest:'If after the feasibility note we think you should buy an existing yacht and adapt it, we will say so and the note is still free. That is a real outcome for about one project in five, usually when the budget and the ambition do not meet.'
+ },
+ ins:'Bring the access needs of real named people to the first call rather than a general category. A design brief that says "wheelchair accessible" produces a compromise. A brief that says "a power chair user of 190 kg who transfers independently and wants to helm" produces a yacht.'}
+
+];
+
+</script>
+
+<script>
+/* ============================================================
+   MARINE AGENT · live demo run scripts
+   Each demo plays step by step: agents activate, artifacts appear.
+   ============================================================ */
+
+const RUNS = {
+
+/* ---------- 1 · brief to concept GA ---------- */
+'run-ga': {
+  title:'Owner brief to concept general arrangement',
+  sub:'Six weeks of work, played in ninety seconds',
+  input:'Wheelchair user, wants to helm independently. 12 guests, 4 crew. Mediterranean and Caribbean. Budget horizon £8m.',
+  phases:[
+   {p:'INTAKE', steps:[
+    {a:'Marine Agent', i:'◆', t:'Parse the owner brief', d:'Extracts 5 fixed decisions and 23 constraints', ms:900},
+    {a:'Accessibility consultant', i:'♿', t:'Set the access baseline', d:'1200mm corridors, 1500mm turning, 900mm doors, zero thresholds', ms:1100,
+     art:{n:'Accessibility Project Standard v0.1', k:'DOC'}},
+    {a:'Compliance consultant', i:'§', t:'Check the passenger number', d:'12 guests keeps you in REG Yacht Code Part A. Flag confirmed.', ms:900,
+     find:{t:'Constraint locked', d:'Guest count cannot exceed 12 without restarting stability work'}}
+   ]},
+   {p:'CONSTRAINTS', steps:[
+    {a:'Naval architect', i:'⚓', t:'Test monohull at 24m', d:'Beam 6.2m. Corridor budget fails after two cabins.', ms:1000,
+     find:{t:'Monohull rejected', d:'Heel of 20 to 30 degrees makes a chair uncontrollable at any length'}},
+    {a:'Naval architect', i:'⚓', t:'Test catamaran at 24.8m', d:'Beam 10.8m. Corridors, turning circles and 4 cabins all fit.', ms:1100},
+    {a:'Hydrodynamics', i:'≈', t:'First motion estimate', d:'Heel under sail below 8 degrees. Roll acceleration within comfort target.', ms:1000,
+     art:{n:'Platform Comparison Study', k:'PDF'}}
+   ]},
+   {p:'GENERATION', steps:[
+    {a:'Yacht designer', i:'◺', t:'Lay out the step free plane', d:'Bridgedeck as one continuous level across the full beam', ms:1200},
+    {a:'Yacht designer', i:'◺', t:'Place the helm', d:'Inboard, at deck level. Roll in or transfer across.', ms:900,
+     find:{t:'Design decision', d:'Costs nothing at concept. Impossible to add after structure is frozen.'}},
+    {a:'Interior designer', i:'◳', t:'Size cabins around circulation', d:'Circulation drawn first, cabins fitted to what remains', ms:1100},
+    {a:'Structural engineer', i:'⊞', t:'Locate the lift trunks', d:'One per hull, tied into bulkheads, watertight subdivision preserved', ms:1200,
+     find:{t:'Early catch', d:'Lift trunk clashed with a watertight bulkhead. Moved 900mm aft before anything was drawn properly.'}}
+   ]},
+   {p:'VALIDATION', steps:[
+    {a:'User co-design panel', i:'◉', t:'Drive the plan in VR', d:'Power chair user tests every route at seated eye height', ms:1300,
+     find:{t:'Panel finding', d:'Galley island blocked the turning circle. Island removed, peninsula instead.'}},
+    {a:'Occupational therapist', i:'✛', t:'Check transfer geometry', d:'Berth height, head clearances, hoist track runs', ms:1000},
+    {a:'Weight control engineer', i:'⚖', t:'First weight pass', d:'Lifts, hoists and reinforcement add 2.1 tonnes over a standard build', ms:1000,
+     find:{t:'Budget set', d:'8% weight margin held to delivery from this moment on'}}
+   ]},
+   {p:'OUTPUT', steps:[
+    {a:'Cost estimator', i:'∑', t:'Build the cost envelope', d:'£6.4m to £9.2m depending on yard and propulsion', ms:900,
+     art:{n:'Cost Envelope, Stage 1', k:'XLS'}},
+    {a:'Marine Agent', i:'◆', t:'Assemble the package', d:'Six documents, cross referenced and version controlled', ms:1000,
+     art:{n:'Concept GA Rev C', k:'DWG'}}
+   ]}
+  ],
+  result:{
+   t:'Concept package complete',
+   kpis:[{l:'ELAPSED',v:'6 weeks'},{l:'AGENTS USED',v:'10'},{l:'ISSUES CAUGHT',v:'4'},{l:'COST',v:'£45k'}],
+   out:['Mission brief with 5 locked decisions','Accessibility Project Standard v1.0','Concept GA Rev C, step free throughout',
+        'Platform comparison with the monohull rejection reasoned','Cost envelope, £6.4m to £9.2m','Regulatory feasibility note, Part A route'],
+   note:'Three of the four issues found here would have cost six figures if they had surfaced during detailed design. The lift trunk clash alone would have meant re-cutting a watertight bulkhead.'
+  }
+},
+
+/* ---------- 2 · mock up test ---------- */
+'run-mockup': {
+  title:'The 1:1 cabin mock up test',
+  sub:'What actually happens when real users roll in',
+  input:'Plywood and foam cabin plus wetroom, built to Concept GA Rev C. Four panel members, two hours.',
+  phases:[
+   {p:'BUILD', steps:[
+    {a:'Prototype workshop', i:'▦', t:'Build to drawing', d:'Full size cabin and wetroom, correct dimensions, no finishes', ms:1000},
+    {a:'Accessibility consultant', i:'♿', t:'Pre check against the standard', d:'Every dimension measured before anyone arrives', ms:900,
+     find:{t:'Already failing', d:'Door opening measured 870mm clear, not 900mm. Hinge type was the cause.'}}
+   ]},
+   {p:'TASK TESTING', steps:[
+    {a:'Manual chair user', i:'◉', t:'Task 1, enter and close the door unaided', d:'Completed, but needed three attempts', ms:1100,
+     find:{t:'FAIL', d:'No pull handle on the inside face. Added to standard as a mandatory item.'}},
+    {a:'Manual chair user', i:'◉', t:'Task 2, transfer to the berth', d:'Completed unaided', ms:900, find:{t:'PASS', d:'500mm berth height confirmed correct'}},
+    {a:'Power chair user', i:'◉', t:'Task 3, turn 180 degrees beside the berth', d:'Failed. Chair is 1180mm long.', ms:1100,
+     find:{t:'FAIL', d:'1500mm circle is a land standard. Power chairs at sea need 1600mm. Standard revised.'}},
+    {a:'Power chair user', i:'◉', t:'Task 4, reach the wetroom controls', d:'Shower control at 1250mm, out of reach', ms:1000,
+     find:{t:'FAIL', d:'Dropped to 1050mm. Nobody had specified control height, only counter height.'}},
+    {a:'Walker user', i:'◉', t:'Task 5, cross the cabin with a frame', d:'Completed, but no rest point', ms:900,
+     find:{t:'PARTIAL', d:'Perch seat added at the cabin entrance. The walker user group is the one most often forgotten.'}},
+    {a:'Blind guest', i:'◉', t:'Task 6, locate the head unaided', d:'Found it, but could not find the call button', ms:1000,
+     find:{t:'FAIL', d:'Tactile marker added at the call point. Costs almost nothing when designed in.'}}
+   ]},
+   {p:'RESOLUTION', steps:[
+    {a:'Accessibility consultant', i:'♿', t:'Revise the standard', d:'Six changes, four of them dimensional', ms:1000,
+     art:{n:'Accessibility Standard v1.1', k:'DOC'}},
+    {a:'Interior designer', i:'◳', t:'Redraw the cabin', d:'Turning circle to 1600mm. One cabin lost 180mm of wardrobe.', ms:1100},
+    {a:'Naval architect', i:'⚓', t:'Check the knock on', d:'Bigger circles across 4 cabins. Confirms the catamaran beam was the right call.', ms:900},
+    {a:'Marine Agent', i:'◆', t:'Film and package', d:'Edited footage of users completing tasks, for the investor pack', ms:900,
+     art:{n:'User Validation Film, 3 min', k:'MP4'}}
+   ]}
+  ],
+  result:{
+   t:'Six failures found for £32k',
+   kpis:[{l:'TASKS TESTED',v:'6'},{l:'FAILED',v:'4'},{l:'STANDARD CHANGES',v:'6'},{l:'COST',v:'£32k'}],
+   out:['Accessibility Standard v1.1 with corrected dimensions','Revised cabin and wetroom drawings',
+        'Three minute film of real users, the strongest fundraising asset you will own',
+        'Panel sign off, gate 2 of 2 passed'],
+   note:'Every one of those four failures would have been built into four cabins and discovered at sea trials. The turning circle error alone would have meant rebuilding cabin joinery in a finished yacht.'
+  }
+},
+
+/* ---------- 3 · class approval ---------- */
+'run-class': {
+  title:'Assembling the class approval submission',
+  sub:'From design model to a stamped drawing set',
+  input:'Basic design complete. Target: Lloyd\u2019s Register plan approval, REG Yacht Code Part A, Cayman flag.',
+  phases:[
+   {p:'PREPARE', steps:[
+    {a:'Naval architect', i:'⚓', t:'Freeze the hull definition', d:'Lines plan, offsets and hydrostatics locked', ms:1000,
+     art:{n:'Lines Plan and Hydrostatics', k:'DWG'}},
+    {a:'Stability specialist', i:'⇕', t:'Run intact stability', d:'All loading conditions, Code criteria applied', ms:1200,
+     find:{t:'Margin tight', d:'Lift masses high in the structure reduce GM. Battery bank moved 400mm lower.'}},
+    {a:'Structural engineer', i:'⊞', t:'Scantling calculations', d:'Laminate schedule, local reinforcement under lifts and hoist tracks', ms:1200,
+     art:{n:'Structural Calculations', k:'PDF'}},
+    {a:'Systems engineer', i:'⚙', t:'Systems schematics', d:'Electrical, hydraulic, fire, bilge, HVAC', ms:1000}
+   ]},
+   {p:'THE HARD PART', steps:[
+    {a:'Structural engineer', i:'⊞', t:'Submit the threshold detail', d:'Recessed pan and drainage channel at every weathertight door', ms:1300,
+     find:{t:'This is the one', d:'No precedent in the surveyor\u2019s experience. Treated as a novel detail requiring justification.'}},
+    {a:'Compliance consultant', i:'§', t:'Build the equivalence argument', d:'Demonstrates the detail meets weathertight intent without a coaming', ms:1300,
+     art:{n:'Threshold Equivalence Case', k:'PDF'}},
+    {a:'Accessibility consultant', i:'♿', t:'Attach the project standard', d:'Submitted as a contractual annex so the surveyor witnesses against it', ms:900,
+     find:{t:'Leverage', d:'Class has no accessibility rule, but will witness a contractual standard. That makes it inspected.'}}
+   ]},
+   {p:'REVIEW', steps:[
+    {a:'Class surveyor', i:'✓', t:'First review returns comments', d:'17 comments. 11 minor, 4 substantive, 2 on the threshold detail.', ms:1400,
+     find:{t:'Expected', d:'A clean first submission usually means the submission was not detailed enough'}},
+    {a:'Structural engineer', i:'⊞', t:'Respond on drainage capacity', d:'Green water loading case added, channel cross section increased', ms:1100},
+    {a:'Stability specialist', i:'⇕', t:'Respond on damage stability', d:'Two compartment case re-run with the revised lift trunk', ms:1100},
+    {a:'Class surveyor', i:'✓', t:'Second review', d:'All comments closed. Approval in principle issued.', ms:1200,
+     art:{n:'Approval in Principle', k:'CERT'}}
+   ]},
+   {p:'FLAG', steps:[
+    {a:'Flag administration', i:'⚑', t:'Accept the safety case', d:'Evacuation arrangement for reduced mobility reviewed and accepted in writing', ms:1200,
+     art:{n:'Flag Acceptance Letter', k:'DOC'}},
+    {a:'Marine Agent', i:'◆', t:'Release to tender', d:'Approved set issued to the shipyard tender list', ms:800}
+   ]}
+  ],
+  result:{
+   t:'Approved and ready to tender',
+   kpis:[{l:'ELAPSED',v:'17 weeks'},{l:'COMMENTS',v:'17'},{l:'SUBMISSIONS',v:'2'},{l:'AGENTS',v:'8'}],
+   out:['Lines plan and hydrostatics, approved','Structural calculations, approved','Intact and damage stability, approved',
+        'Threshold equivalence case, accepted','Flag acceptance of the evacuation safety case','Approval in principle certificate',
+        'Tender package for the shipyard'],
+   note:'The threshold equivalence case is the document that does not exist on a conventional yacht project, and it is the one that takes longest. Budget for two review rounds on it and start it early.'
+  }
+},
+
+/* ---------- 4 · change request ---------- */
+'run-change': {
+  title:'One change request, seven agents',
+  sub:'The owner asks for a sauna in month 26',
+  input:'Owner request: "Can we add a small sauna in the port hull?" Build contract is signed. Production drawings are 60% complete.',
+  phases:[
+   {p:'ASSESS', steps:[
+    {a:'Marine Agent', i:'◆', t:'Route the request', d:'Identifies 7 disciplines affected, opens a change order file', ms:800},
+    {a:'Weight control engineer', i:'⚖', t:'Weight impact', d:'Sauna, heater, insulation and structure: 620kg, high in the hull', ms:1000,
+     find:{t:'Flag raised', d:'Consumes 31% of the remaining weight margin for one feature'}},
+    {a:'Stability specialist', i:'⇕', t:'Stability impact', d:'GM reduction within limits, but damage case needs re-running', ms:1100},
+    {a:'Accessibility consultant', i:'♿', t:'Access impact', d:'Proposed location removes the 1600mm turning circle outside cabin 3', ms:1100,
+     find:{t:'FAIL against the standard', d:'This is a hold point. The change cannot proceed as drawn.'}}
+   ]},
+   {p:'OPTIONS', steps:[
+    {a:'Interior designer', i:'◳', t:'Option A, shrink the sauna', d:'Keeps the turning circle. Sauna becomes a two person unit.', ms:1000},
+    {a:'Interior designer', i:'◳', t:'Option B, relocate to starboard', d:'Clear of circulation but displaces the crew cabin', ms:1000},
+    {a:'Interior designer', i:'◳', t:'Option C, decline', d:'Keeps weight margin and layout intact', ms:800},
+    {a:'Cost estimator', i:'∑', t:'Price all three', d:'A: £74k. B: £118k plus crew cabin rework. C: nil.', ms:1000},
+    {a:'Project manager', i:'▦', t:'Schedule impact', d:'A: 3 weeks. B: 9 weeks and hits the critical path.', ms:900}
+   ]},
+   {p:'DECIDE', steps:[
+    {a:'User co-design panel', i:'◉', t:'Review option A', d:'Turning circle preserved. Sauna door width checked at 900mm.', ms:1000,
+     find:{t:'Conditional pass', d:'Panel approves A provided the sauna bench allows a transfer from a chair'}},
+    {a:'Owner\u2019s representative', i:'◆', t:'Present to the owner', d:'Three options, priced, with the accessibility consequence of each stated plainly', ms:1000},
+    {a:'Marine Agent', i:'◆', t:'Issue the change order', d:'Option A, £74k, 3 weeks, with the transfer bench condition attached', ms:900,
+     art:{n:'Change Order 041', k:'DOC'}},
+    {a:'Weight control engineer', i:'⚖', t:'Update the weight budget', d:'Margin now 5.4%. Logged and reported monthly.', ms:800,
+     find:{t:'Watch item', d:'Two more changes of this size and the margin is gone'}}
+   ]}
+  ],
+  result:{
+   t:'Change approved, standard intact',
+   kpis:[{l:'ELAPSED',v:'9 days'},{l:'AGENTS',v:'7'},{l:'OPTIONS PRICED',v:'3'},{l:'COST',v:'£74k'}],
+   out:['Change Order 041, signed','Revised joinery drawings for the port hull','Weight budget updated and reissued',
+        'Damage stability re-run and filed','Panel condition recorded as a hold point at fit out'],
+   note:'Without the hold point, the first version of this change would have been built. It removed a turning circle outside a cabin, which would have been discovered by a guest, at sea, after delivery.'
+  }
+},
+
+/* ---------- 5 · full journey ---------- */
+'run-journey': {
+  title:'The full journey, idea to delivery',
+  sub:'52 months compressed into two minutes',
+  input:'Starting point: an idea and no drawings. Ending point: a 24.8m accessible catamaran in the water.',
+  phases:[
+   {p:'MONTHS 1-7 · PROTOTYPE', steps:[
+    {a:'Marine Agent', i:'◆', t:'Mission brief', d:'Five decisions locked, including the 12 guest ceiling', ms:800},
+    {a:'Naval architect', i:'⚓', t:'Platform decided', d:'Catamaran, 24.8m. Monohull rejected on heel, not on space.', ms:900},
+    {a:'Accessibility consultant', i:'♿', t:'Standard published', d:'Numbered, dimensioned, contractually usable', ms:800,
+     art:{n:'Accessibility Standard v1.0', k:'DOC'}},
+    {a:'User co-design panel', i:'◉', t:'Mock up tested', d:'Four task failures found and fixed on plywood', ms:900,
+     art:{n:'User Validation Film', k:'MP4'}},
+    {a:'Investor relations', i:'◈', t:'Gate 1 closed', d:'£295k raised against the prototype package', ms:900,
+     find:{t:'Money gate', d:'The film did more in the room than the drawings'}}
+   ]},
+   {p:'MONTHS 8-18 · BASIC DESIGN', steps:[
+    {a:'Naval architect', i:'⚓', t:'Lines and hydrostatics', d:'Hull frozen', ms:800},
+    {a:'Structural engineer', i:'⊞', t:'Structure and thresholds', d:'Recessed pan detail engineered at every weathertight door', ms:1000},
+    {a:'Class surveyor', i:'✓', t:'Approval in principle', d:'Two submission rounds, 17 comments closed', ms:1000,
+     art:{n:'Approval in Principle', k:'CERT'}},
+    {a:'Grant writer', i:'✎', t:'Gate 2 closed', d:'£180k non dilutive from an accessibility innovation fund', ms:900}
+   ]},
+   {p:'MONTHS 15-24 · CONTRACT', steps:[
+    {a:'Owner\u2019s representative', i:'◆', t:'Yard tender', d:'Four yards. Two refused the accessibility annex and were dropped.', ms:1000,
+     find:{t:'Revealing', d:'A yard that argues with the standard at tender will fight it for three years'}},
+    {a:'Maritime lawyer', i:'⚖', t:'Contract signed', d:'Accessibility schedule annexed, hold points tied to payment milestones', ms:1000},
+    {a:'Investor relations', i:'◈', t:'Gate 3 closed', d:'£8.1m build finance secured against the contract and class approval', ms:1100,
+     find:{t:'Why it worked', d:'Lenders secured against a real asset with class approval, not an idea'}}
+   ]},
+   {p:'MONTHS 24-44 · BUILD', steps:[
+    {a:'Shipyard', i:'⛴', t:'Hull infusion', d:'Composite sandwich, both hulls and bridgedeck', ms:900},
+    {a:'Lift specialist', i:'⇅', t:'Lifts installed', d:'Ordered at contract signature. Arrived on time because of it.', ms:900},
+    {a:'Accessibility consultant', i:'♿', t:'Hold point 3 of 5', d:'Door clear widths measured. Two doors rejected and rehung.', ms:1000,
+     find:{t:'Caught', d:'Hinge type had crept back in. Found at inspection, not at delivery.'}},
+    {a:'Weight control engineer', i:'⚖', t:'Weight at delivery', d:'Within margin. 5.1% remaining.', ms:800}
+   ]},
+   {p:'MONTHS 44-52 · DELIVERY', steps:[
+    {a:'Commissioning engineer', i:'⚗', t:'Systems proved', d:'Lifts, hoists, platform and manual overrides all tested', ms:900},
+    {a:'User co-design panel', i:'◉', t:'Sea trial validation', d:'Power chair user helms unaided in 18 knots', ms:1200,
+     find:{t:'Acceptance criterion met', d:'This was written into the contract. The yard built for it.'}},
+    {a:'Flag administration', i:'⚑', t:'Registered', d:'Red Ensign. Safety case accepted as submitted at design stage.', ms:800},
+    {a:'Marine Agent', i:'◆', t:'Delivered', d:'Handover, crew trained, warranty period begins', ms:900,
+     art:{n:'As Built Package', k:'ZIP'}}
+   ]}
+  ],
+  result:{
+   t:'Delivered in 52 months',
+   kpis:[{l:'DURATION',v:'52 mo'},{l:'RAISED',v:'£8.6m'},{l:'AGENTS USED',v:'24'},{l:'HOLD POINTS',v:'5'}],
+   out:['24.8m accessible catamaran, step free throughout','Owner helms independently from a wheelchair',
+        '12 guests, 4 accessible cabins, two lifts','Class approved, Red Ensign registered',
+        'Accessibility standard published and reusable','Crew trained in accessible operation'],
+   note:'Count the hold points. Five moments where an independent consultant could stop payment until the standard was met. That mechanism, agreed before the contract was signed, is what separates this from a yacht with a wide door.'
+  }
+}
+
+};
+
+/* demo entries appear as chips inside their section */
+const DEMO_CHIPS = [
+  {sec:'proto',  key:'run-ga',      t:'DEMO · Brief to concept GA',     q:'Watch the agent turn an owner brief into a layout'},
+  {sec:'proto',  key:'run-mockup',  t:'DEMO · The mock up test',        q:'Watch four disabled users break the design on purpose'},
+  {sec:'design', key:'run-class',   t:'DEMO · Class approval',          q:'Watch a submission go from model to stamped drawings'},
+  {sec:'agents', key:'run-change',  t:'DEMO · One change, seven agents',q:'Watch the agents handle a sauna request in month 26'},
+  {sec:'why',    key:'run-journey', t:'DEMO · The full journey',        q:'Watch 52 months from idea to delivery'}
+];
+
+</script>
+
+<script>
+/* ============================================================
+   MARINE AGENT · deliverables
+   Real rendered output documents, not filenames.
+   ============================================================ */
+
+const PROJ = { no:'NA-2847', name:'M/Y ACCESSIBLE CATAMARAN 24.8m', client:'PRIVATE OWNER', by:'NOBLE ARCHITECTURE' };
+
+function sheet(o){
+  return `<div class="doc">
+    <div class="doc-top">
+      <div class="doc-brand"><span class="doc-orb"></span><div>
+        <b>${PROJ.by}</b><span>MARINE AGENT · DELIVERABLE</span></div></div>
+      <div class="doc-stamp ${o.stampClass||''}">${o.stamp||'ISSUED'}</div>
+    </div>
+    <div class="doc-title">
+      <div><div class="doc-k">${o.kind}</div><h4>${o.title}</h4></div>
+    </div>
+    <div class="doc-block">${o.body}</div>
+    <div class="doc-tb">
+      <div><span>PROJECT</span><b>${PROJ.no}</b></div>
+      <div><span>VESSEL</span><b>${PROJ.name}</b></div>
+      <div><span>DOC No</span><b>${o.no}</b></div>
+      <div><span>REV</span><b>${o.rev}</b></div>
+      <div><span>SCALE</span><b>${o.scale||'NTS'}</b></div>
+      <div><span>DRAWN</span><b>${o.drawn||'NA'}</b></div>
+      <div><span>CHECKED</span><b>${o.chk||'AC'}</b></div>
+      <div><span>DATE</span><b>${o.date||'2026-03-14'}</b></div>
+    </div>
+  </div>`;
+}
+
+const DOCS = {
+
+/* ---------- PROTOTYPE OUTPUT 1 · concept GA ---------- */
+ga:{ label:'Concept General Arrangement', kind:'DRAWING', tag:'PROTOTYPE OUTPUT',
+ html:()=>sheet({kind:'GENERAL ARRANGEMENT · MAIN DECK',title:'Concept GA, single level guest environment',
+  no:'NA-2847-GA-001',rev:'C',scale:'1:100 @ A1',drawn:'YD',chk:'NA/AC',stamp:'APPROVED IN PRINCIPLE',stampClass:'ok',
+  body:`
+  <svg viewBox="0 0 760 330" class="dwg" role="img" aria-label="General arrangement, main deck">
+    <defs><pattern id="hatch" width="6" height="6" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+      <line x1="0" y1="0" x2="0" y2="6" stroke="#9FC4D8" stroke-width="1"/></pattern></defs>
+    <path d="M70 46 Q380 10 690 68 L690 262 Q380 320 70 284 Z" fill="#fff" stroke="#0A3353" stroke-width="2.2"/>
+    <path d="M70 46 Q380 10 690 68 L690 112 Q380 62 70 96 Z" fill="url(#hatch)" opacity=".55"/>
+    <path d="M70 234 Q380 268 690 218 L690 262 Q380 320 70 284 Z" fill="url(#hatch)" opacity=".55"/>
+    <text x="86" y="78" font-size="8.5" fill="#0F4C75" font-family="monospace">PORT HULL</text>
+    <text x="86" y="276" font-size="8.5" fill="#0F4C75" font-family="monospace">STBD HULL</text>
+
+    <rect x="104" y="108" width="128" height="114" rx="6" fill="#F2F8FC" stroke="#1273A8" stroke-width="1.4"/>
+    <text x="168" y="156" text-anchor="middle" font-size="11" font-weight="700" fill="#0A3353">FOREDECK</text>
+    <text x="168" y="171" text-anchor="middle" font-size="8" fill="#6A8294">LOUNGE · RAMP 1:14</text>
+
+    <rect x="248" y="104" width="196" height="122" rx="6" fill="#fff" stroke="#0A3353" stroke-width="1.8"/>
+    <text x="346" y="150" text-anchor="middle" font-size="12" font-weight="800" fill="#0A3353">SALOON / GALLEY</text>
+    <text x="346" y="166" text-anchor="middle" font-size="8" fill="#6A8294">COUNTER 850 · KNEE REC. 700</text>
+    <circle cx="300" cy="196" r="22" fill="none" stroke="#1B9E77" stroke-width="1" stroke-dasharray="3 3"/>
+    <text x="300" y="199" text-anchor="middle" font-size="7" fill="#13775A" font-family="monospace">Ø1600</text>
+
+    <rect x="460" y="110" width="74" height="56" rx="5" fill="#E8F6F1" stroke="#1B9E77" stroke-width="1.6"/>
+    <text x="497" y="134" text-anchor="middle" font-size="9" font-weight="700" fill="#13775A">HELM</text>
+    <text x="497" y="147" text-anchor="middle" font-size="7" fill="#13775A">ROLL-IN</text>
+
+    <rect x="460" y="176" width="74" height="54" rx="5" fill="#F2F8FC" stroke="#1273A8" stroke-width="1.3"/>
+    <text x="497" y="206" text-anchor="middle" font-size="9" font-weight="700" fill="#0A3353">COCKPIT</text>
+
+    <rect x="552" y="128" width="62" height="84" rx="5" fill="#FDF4E3" stroke="#C08A2E" stroke-width="1.5"/>
+    <text x="583" y="164" text-anchor="middle" font-size="8.5" font-weight="700" fill="#8A6114">BATHING</text>
+    <text x="583" y="177" text-anchor="middle" font-size="8.5" font-weight="700" fill="#8A6114">PLATFORM</text>
+    <text x="583" y="192" text-anchor="middle" font-size="7" fill="#8A6114">HYD. HI-LO</text>
+
+    <rect x="266" y="54" width="96" height="42" rx="5" fill="#fff" stroke="#1273A8" stroke-width="1.2"/>
+    <text x="314" y="72" text-anchor="middle" font-size="8.5" font-weight="700" fill="#0A3353">CABIN 1</text>
+    <text x="314" y="85" text-anchor="middle" font-size="7" fill="#6A8294">ACCESSIBLE</text>
+    <rect x="266" y="234" width="96" height="42" rx="5" fill="#fff" stroke="#1273A8" stroke-width="1.2"/>
+    <text x="314" y="252" text-anchor="middle" font-size="8.5" font-weight="700" fill="#0A3353">CABIN 2</text>
+    <text x="314" y="265" text-anchor="middle" font-size="7" fill="#6A8294">ACCESSIBLE</text>
+
+    <rect x="382" y="56" width="42" height="38" rx="4" fill="#E8F6F1" stroke="#1B9E77" stroke-width="1.4"/>
+    <text x="403" y="79" text-anchor="middle" font-size="8" font-weight="700" fill="#13775A">LIFT</text>
+    <rect x="382" y="236" width="42" height="38" rx="4" fill="#E8F6F1" stroke="#1B9E77" stroke-width="1.4"/>
+    <text x="403" y="259" text-anchor="middle" font-size="8" font-weight="700" fill="#13775A">LIFT</text>
+
+    <path d="M112 165 L606 165" stroke="#1B9E77" stroke-width="2" stroke-dasharray="8 5"/>
+    <text x="78" y="168" font-size="7.5" font-family="monospace" fill="#13775A">STEP FREE</text>
+
+    <line x1="70" y1="306" x2="690" y2="306" stroke="#6A8294" stroke-width=".8"/>
+    <line x1="70" y1="300" x2="70" y2="312" stroke="#6A8294" stroke-width=".8"/>
+    <line x1="690" y1="300" x2="690" y2="312" stroke="#6A8294" stroke-width=".8"/>
+    <text x="380" y="320" text-anchor="middle" font-size="8" font-family="monospace" fill="#35505F">LOA 24 800</text>
+    <line x1="706" y1="68" x2="706" y2="262" stroke="#6A8294" stroke-width=".8"/>
+    <text x="724" y="170" text-anchor="middle" font-size="8" font-family="monospace" fill="#35505F" transform="rotate(90 724 170)">BEAM 10 800</text>
+  </svg>
+  <div class="doc-notes">
+    <div class="doc-nh">NOTES</div>
+    <ol>
+      <li>All guest circulation to be step free. No threshold, coaming or sill permitted on the guest route. Refer NA-2847-DT-014 for weathertight door detail.</li>
+      <li>Minimum clear corridor width 1200. Minimum turning circle Ø1600 at every route terminus and beside each berth.</li>
+      <li>All door clear openings 900 minimum measured clear of the open leaf.</li>
+      <li>Galley island deleted at Rev B following user panel review. Peninsula layout retained to preserve turning circle.</li>
+      <li>Helm positioned inboard at deck level. Chair access direct, transfer seat to stbd.</li>
+      <li>Platform lifts P and S, 1100 x 1400 clear, 250 kg SWL, manual lowering required.</li>
+      <li>Dimensions in millimetres. Do not scale from this drawing.</li>
+    </ol>
+  </div>`})},
+
+/* ---------- PROTOTYPE OUTPUT 2 · accessibility standard ---------- */
+std:{ label:'Accessibility Project Standard', kind:'SPECIFICATION', tag:'PROTOTYPE OUTPUT',
+ html:()=>sheet({kind:'PROJECT SPECIFICATION',title:'Accessibility Project Standard',
+  no:'NA-2847-AS-001',rev:'1.1',drawn:'AC',chk:'PANEL',stamp:'PANEL SIGNED',stampClass:'ok',
+  body:`
+  <div class="doc-intro">Binding specification. To be annexed to the building contract. Variation requires written
+  approval of the Accessibility Consultant and the User Co-Design Panel. No cost based variation permitted
+  without that approval.</div>
+  <table class="doc-tbl">
+    <thead><tr><th>Cl.</th><th>Requirement</th><th>Value</th><th>Tol.</th><th>Verify</th></tr></thead>
+    <tbody>
+    <tr><td>1.1</td><td>Clear corridor width, guest route</td><td class="v">1200 mm</td><td>+∞ / -0</td><td>Measure</td></tr>
+    <tr><td>1.2</td><td>Turning circle, all route termini and beside each berth</td><td class="v">Ø1600 mm</td><td>+∞ / -0</td><td>Measure</td></tr>
+    <tr class="chg"><td>1.3</td><td>Door clear opening, measured clear of open leaf</td><td class="v">900 mm</td><td>+∞ / -0</td><td>Measure</td></tr>
+    <tr class="chg"><td>1.4</td><td>Threshold height, all guest doors internal and external</td><td class="v">0 mm</td><td>+5 / -0</td><td>Measure</td></tr>
+    <tr><td>1.5</td><td>Ramp gradient, with level landing per 9 m run</td><td class="v">1:12 max</td><td>Flatter OK</td><td>Measure</td></tr>
+    <tr><td>1.6</td><td>Side deck clear width, both sides</td><td class="v">1100 mm</td><td>+∞ / -0</td><td>Measure</td></tr>
+    <tr><td>2.1</td><td>Counter and galley working height</td><td class="v">850 mm</td><td>±10</td><td>Measure</td></tr>
+    <tr><td>2.2</td><td>Knee recess beneath counters</td><td class="v">700 mm</td><td>+∞ / -0</td><td>Measure</td></tr>
+    <tr class="chg"><td>2.3</td><td>Control and switch height, incl. shower and winch controls</td><td class="v">900-1050 mm</td><td>Band</td><td>Measure</td></tr>
+    <tr><td>2.4</td><td>Berth top height for lateral transfer</td><td class="v">500 mm</td><td>±15</td><td>Measure</td></tr>
+    <tr><td>2.5</td><td>Ceiling hoist track, berth to shower seat, continuous</td><td class="v">Required</td><td>-</td><td>Load test</td></tr>
+    <tr><td>3.1</td><td>Wetroom, level access, no tray upstand</td><td class="v">0 mm</td><td>+0</td><td>Measure</td></tr>
+    <tr><td>3.2</td><td>Clear transfer space beside WC</td><td class="v">900 mm</td><td>+∞ / -0</td><td>Measure</td></tr>
+    <tr class="chg"><td>3.3</td><td>Rest perch at cabin entry, walker users</td><td class="v">Required</td><td>-</td><td>Inspect</td></tr>
+    <tr><td>4.1</td><td>Visual contrast, floor to wall to door to handle</td><td class="v">LRV ≥30</td><td>-</td><td>Meter</td></tr>
+    <tr><td>4.2</td><td>General alarm, audible and visual in all cabins and heads</td><td class="v">Required</td><td>-</td><td>Test</td></tr>
+    <tr class="chg"><td>4.3</td><td>Tactile marker at every emergency call point</td><td class="v">Required</td><td>-</td><td>Inspect</td></tr>
+    <tr><td>4.4</td><td>Hearing induction loop, saloon and helm</td><td class="v">Required</td><td>-</td><td>Test</td></tr>
+    </tbody>
+  </table>
+  <div class="doc-rev">
+    <div class="doc-nh">REVISION HISTORY</div>
+    <table class="doc-tbl sm"><tbody>
+      <tr><td>1.0</td><td>Issued at concept</td><td>2026-02-10</td></tr>
+      <tr><td>1.1</td><td>Six clauses revised after 1:1 mock up testing. Clauses marked in amber changed.</td><td>2026-03-14</td></tr>
+    </tbody></table>
+  </div>`})},
+
+/* ---------- PROTOTYPE OUTPUT 3 · validation report ---------- */
+val:{ label:'User Validation Report', kind:'TEST REPORT', tag:'PROTOTYPE OUTPUT',
+ html:()=>sheet({kind:'PROTOTYPE TEST REPORT',title:'1:1 cabin and wetroom mock up, task validation',
+  no:'NA-2847-TR-002',rev:'A',drawn:'AC',chk:'OT',stamp:'4 FAILURES FOUND',stampClass:'bad',
+  body:`
+  <div class="doc-intro">Four panel members, two hours, six defined tasks against Concept GA Rev B.
+  Each task attempted unaided unless otherwise recorded.</div>
+  <table class="doc-tbl">
+    <thead><tr><th>#</th><th>Task</th><th>Tester</th><th>Result</th><th>Finding and action</th></tr></thead>
+    <tbody>
+    <tr><td>1</td><td>Enter cabin and close door unaided</td><td>Manual chair</td><td><span class="rs bad">FAIL</span></td>
+      <td>No internal pull handle. Clause 1.3a added, handle mandatory.</td></tr>
+    <tr><td>2</td><td>Transfer chair to berth</td><td>Manual chair</td><td><span class="rs ok">PASS</span></td>
+      <td>500 mm berth height confirmed correct. No change.</td></tr>
+    <tr><td>3</td><td>Turn 180° beside berth</td><td>Power chair</td><td><span class="rs bad">FAIL</span></td>
+      <td>Chair length 1180 mm. Ø1500 insufficient. Clause 1.2 revised to Ø1600.</td></tr>
+    <tr><td>4</td><td>Reach and operate shower control</td><td>Power chair</td><td><span class="rs bad">FAIL</span></td>
+      <td>Control at 1250 mm, out of reach. Clause 2.3 added, 900-1050 band.</td></tr>
+    <tr><td>5</td><td>Cross cabin with walking frame</td><td>Walker</td><td><span class="rs warn">PARTIAL</span></td>
+      <td>No rest point. Clause 3.3 added, perch at cabin entry.</td></tr>
+    <tr><td>6</td><td>Locate head and emergency call unaided</td><td>Blind</td><td><span class="rs bad">FAIL</span></td>
+      <td>Call point not findable by touch. Clause 4.3 added, tactile marker.</td></tr>
+    </tbody>
+  </table>
+  <div class="doc-kpi">
+    <div><span>TASKS</span><b>6</b></div>
+    <div><span>PASSED</span><b>1</b></div>
+    <div><span>FAILED</span><b>4</b></div>
+    <div><span>STANDARD CHANGES</span><b>6</b></div>
+    <div><span>COST OF TEST</span><b>£32k</b></div>
+    <div><span>EST. COST IF BUILT</span><b>£260k+</b></div>
+  </div>
+  <div class="doc-sign">
+    <div><span>Accessibility Consultant</span><i>signed</i></div>
+    <div><span>Occupational Therapist</span><i>signed</i></div>
+    <div><span>User Panel Chair</span><i>signed</i></div>
+  </div>`})},
+
+/* ---------- DETAILED DESIGN OUTPUT 1 · threshold detail ---------- */
+thr:{ label:'Threshold Detail, production', kind:'DRAWING', tag:'DETAILED DESIGN OUTPUT',
+ html:()=>sheet({kind:'PRODUCTION DETAIL · SECTION',title:'Zero threshold at weathertight door, recessed pan and drainage',
+  no:'NA-2847-DT-014',rev:'D',scale:'1:5 @ A3',drawn:'SE',chk:'CLASS',stamp:'CLASS ACCEPTED',stampClass:'ok',
+  body:`
+  <svg viewBox="0 0 740 300" class="dwg" role="img" aria-label="Section through zero threshold door">
+    <rect x="40" y="150" width="660" height="26" fill="#DCE9F1" stroke="#0A3353" stroke-width="1.6"/>
+    <text x="60" y="167" font-size="8" font-family="monospace" fill="#0A3353">DECK LAMINATE</text>
+    <rect x="40" y="176" width="660" height="40" fill="#EFF5F9" stroke="#0A3353" stroke-width="1.2"/>
+    <text x="60" y="200" font-size="8" font-family="monospace" fill="#6A8294">CORE, LOCAL HIGH DENSITY INSERT</text>
+
+    <rect x="300" y="150" width="150" height="34" fill="#fff" stroke="#D9534F" stroke-width="1.8"/>
+    <text x="375" y="171" text-anchor="middle" font-size="8" font-family="monospace" fill="#A93B38">RECESSED PAN</text>
+
+    <rect x="336" y="150" width="78" height="12" fill="#C9E3F0" stroke="#1273A8" stroke-width="1.2"/>
+    <line x1="344" y1="150" x2="344" y2="162" stroke="#1273A8"/><line x1="356" y1="150" x2="356" y2="162" stroke="#1273A8"/>
+    <line x1="368" y1="150" x2="368" y2="162" stroke="#1273A8"/><line x1="380" y1="150" x2="380" y2="162" stroke="#1273A8"/>
+    <line x1="392" y1="150" x2="392" y2="162" stroke="#1273A8"/><line x1="404" y1="150" x2="404" y2="162" stroke="#1273A8"/>
+    <text x="375" y="138" text-anchor="middle" font-size="8" font-family="monospace" fill="#0F4C75">GRATED CHANNEL</text>
+
+    <line x1="40" y1="150" x2="700" y2="150" stroke="#1B9E77" stroke-width="2.4"/>
+    <text x="520" y="144" font-size="8.5" font-family="monospace" fill="#13775A">FINISHED FLOOR, CONTINUOUS, 0 mm STEP</text>
+
+    <rect x="286" y="40" width="14" height="110" fill="#8FB3C7" stroke="#0A3353" stroke-width="1.4"/>
+    <rect x="450" y="40" width="14" height="110" fill="#8FB3C7" stroke="#0A3353" stroke-width="1.4"/>
+    <text x="268" y="36" font-size="8" font-family="monospace" fill="#0A3353">DOOR FRAME</text>
+    <path d="M300 56 L450 56" stroke="#0A3353" stroke-width="3"/>
+    <text x="375" y="50" text-anchor="middle" font-size="8" font-family="monospace" fill="#0A3353">WEATHERTIGHT DOOR</text>
+    <path d="M300 62 L450 62" stroke="#D9534F" stroke-width="1.4" stroke-dasharray="4 3"/>
+    <text x="375" y="76" text-anchor="middle" font-size="7.5" font-family="monospace" fill="#A93B38">COMPRESSION SEAL, 4-SIDE</text>
+
+    <path d="M414 156 L470 156 L470 196 L560 196" stroke="#1273A8" stroke-width="2" fill="none"/>
+    <circle cx="560" cy="196" r="11" fill="#fff" stroke="#1273A8" stroke-width="1.6"/>
+    <text x="560" y="199" text-anchor="middle" font-size="7" font-family="monospace" fill="#0F4C75">NRV</text>
+    <text x="596" y="199" font-size="8" font-family="monospace" fill="#0F4C75">TO SCUPPER</text>
+
+    <line x1="300" y1="236" x2="450" y2="236" stroke="#6A8294"/>
+    <line x1="300" y1="230" x2="300" y2="242" stroke="#6A8294"/>
+    <line x1="450" y1="230" x2="450" y2="242" stroke="#6A8294"/>
+    <text x="375" y="252" text-anchor="middle" font-size="8" font-family="monospace" fill="#35505F">900 CLEAR OPENING</text>
+    <line x1="336" y1="266" x2="414" y2="266" stroke="#6A8294"/>
+    <text x="375" y="280" text-anchor="middle" font-size="8" font-family="monospace" fill="#35505F">CHANNEL 420 x 38</text>
+  </svg>
+  <div class="doc-notes">
+    <div class="doc-nh">CONSTRUCTION NOTES</div>
+    <ol>
+      <li>Deck locally recessed 38 mm to form drainage pan. High density core insert to full pan footprint.</li>
+      <li>Grated channel 420 x 38 clear, removable for cleaning, load rated 300 kg point load.</li>
+      <li>Drain to scupper via 50 mm line with non return valve. Capacity verified against green water case, ref NA-2847-CA-009.</li>
+      <li>Door seal to compress on all four sides. Sill seal face flush with finished floor level.</li>
+      <li>Finished floor continuous across opening. Zero step permitted tolerance +5 mm, minus zero.</li>
+      <li>Detail accepted by Class under equivalence case NA-2847-EQ-003 dated 2026-06-02.</li>
+    </ol>
+  </div>`})},
+
+/* ---------- DETAILED DESIGN OUTPUT 2 · compliance matrix ---------- */
+mtx:{ label:'Accessibility Compliance Matrix', kind:'REGISTER', tag:'DETAILED DESIGN OUTPUT',
+ html:()=>sheet({kind:'COMPLIANCE REGISTER',title:'Accessibility Compliance Matrix, clause to drawing to sign off',
+  no:'NA-2847-CM-001',rev:'F',drawn:'AC',chk:'OR',stamp:'18 OF 18 CLOSED',stampClass:'ok',
+  body:`
+  <div class="doc-intro">Every clause of the Accessibility Project Standard traced to a production drawing and a
+  witnessed sign off. This register is the mechanism by which accessibility becomes auditable rather than intended.</div>
+  <table class="doc-tbl">
+    <thead><tr><th>Cl.</th><th>Requirement</th><th>Drawing ref</th><th>Hold pt</th><th>Witnessed</th><th>Status</th></tr></thead>
+    <tbody>
+    <tr><td>1.1</td><td>Corridor 1200</td><td>GA-001 / IN-022</td><td>HP3</td><td>AC + Class</td><td><span class="rs ok">CLOSED</span></td></tr>
+    <tr><td>1.2</td><td>Turning Ø1600</td><td>IN-022 / IN-024</td><td>HP3</td><td>AC + Panel</td><td><span class="rs ok">CLOSED</span></td></tr>
+    <tr><td>1.3</td><td>Door clear 900</td><td>IN-031 sch.</td><td>HP3</td><td>AC</td><td><span class="rs ok">CLOSED</span></td></tr>
+    <tr class="chg"><td>1.4</td><td>Threshold 0 mm</td><td>DT-014</td><td>HP2</td><td>AC + Class</td><td><span class="rs ok">CLOSED</span></td></tr>
+    <tr><td>1.5</td><td>Ramp 1:12</td><td>GA-001 / DT-019</td><td>HP2</td><td>AC</td><td><span class="rs ok">CLOSED</span></td></tr>
+    <tr><td>1.6</td><td>Side deck 1100</td><td>GA-002</td><td>HP2</td><td>AC</td><td><span class="rs ok">CLOSED</span></td></tr>
+    <tr><td>2.1</td><td>Counter 850</td><td>IN-040</td><td>HP4</td><td>AC</td><td><span class="rs ok">CLOSED</span></td></tr>
+    <tr><td>2.2</td><td>Knee recess 700</td><td>IN-040</td><td>HP4</td><td>AC</td><td><span class="rs ok">CLOSED</span></td></tr>
+    <tr><td>2.3</td><td>Controls 900-1050</td><td>EL-018 sch.</td><td>HP4</td><td>AC</td><td><span class="rs ok">CLOSED</span></td></tr>
+    <tr><td>2.4</td><td>Berth 500</td><td>IN-026</td><td>HP4</td><td>AC + OT</td><td><span class="rs ok">CLOSED</span></td></tr>
+    <tr><td>2.5</td><td>Hoist track</td><td>ST-033 / DT-021</td><td>HP3</td><td>AC + Class</td><td><span class="rs ok">CLOSED</span></td></tr>
+    <tr><td>3.1</td><td>Level wetroom</td><td>DT-016</td><td>HP3</td><td>AC</td><td><span class="rs ok">CLOSED</span></td></tr>
+    <tr><td>3.2</td><td>WC transfer 900</td><td>IN-028</td><td>HP4</td><td>AC + OT</td><td><span class="rs ok">CLOSED</span></td></tr>
+    <tr><td>3.3</td><td>Rest perch</td><td>IN-026</td><td>HP4</td><td>AC</td><td><span class="rs ok">CLOSED</span></td></tr>
+    <tr><td>4.1</td><td>Contrast LRV 30</td><td>IN-050 finishes</td><td>HP5</td><td>AC</td><td><span class="rs ok">CLOSED</span></td></tr>
+    <tr><td>4.2</td><td>Visual alarm</td><td>EL-022</td><td>HP5</td><td>AC + Class</td><td><span class="rs ok">CLOSED</span></td></tr>
+    <tr><td>4.3</td><td>Tactile call marker</td><td>IN-052</td><td>HP5</td><td>AC</td><td><span class="rs ok">CLOSED</span></td></tr>
+    <tr><td>4.4</td><td>Induction loop</td><td>EL-025</td><td>HP5</td><td>AC</td><td><span class="rs ok">CLOSED</span></td></tr>
+    </tbody>
+  </table>
+  <div class="doc-kpi">
+    <div><span>CLAUSES</span><b>18</b></div>
+    <div><span>CLOSED</span><b>18</b></div>
+    <div><span>REJECTED AT HP</span><b>3</b></div>
+    <div><span>HOLD POINTS</span><b>5</b></div>
+  </div>
+  <div class="doc-intro" style="margin-top:12px">Three items were rejected at hold point and reworked before
+  acceptance: two doors rehung after a hinge type reduced clear opening to 870 mm, and one shower control relocated.</div>`})},
+
+/* ---------- DETAILED DESIGN OUTPUT 3 · stability and weight ---------- */
+stab:{ label:'Stability and Weight Summary', kind:'CALCULATION', tag:'DETAILED DESIGN OUTPUT',
+ html:()=>sheet({kind:'NAVAL ARCHITECTURE CALCULATION',title:'Intact stability and weight budget summary',
+  no:'NA-2847-CA-004',rev:'C',drawn:'NA',chk:'CLASS',stamp:'CLASS APPROVED',stampClass:'ok',
+  body:`
+  <table class="doc-tbl">
+    <thead><tr><th>Loading condition</th><th>Displ. t</th><th>GM t m</th><th>Required m</th><th>Trim</th><th>Status</th></tr></thead>
+    <tbody>
+    <tr><td>Lightship</td><td class="v">52.4</td><td class="v">4.82</td><td>-</td><td>0.02 a</td><td><span class="rs ok">PASS</span></td></tr>
+    <tr><td>Full load departure</td><td class="v">71.8</td><td class="v">4.11</td><td>≥1.50</td><td>0.14 a</td><td><span class="rs ok">PASS</span></td></tr>
+    <tr><td>Full load arrival, 10% cons.</td><td class="v">63.2</td><td class="v">4.36</td><td>≥1.50</td><td>0.09 a</td><td><span class="rs ok">PASS</span></td></tr>
+    <tr class="chg"><td>All guests one side, both lifts up</td><td class="v">71.8</td><td class="v">3.74</td><td>≥1.50</td><td>0.16 a</td><td><span class="rs ok">PASS</span></td></tr>
+    <tr><td>Damage, 2 compartment</td><td class="v">71.8</td><td class="v">2.18</td><td>≥0.05</td><td>1.42 a</td><td><span class="rs ok">PASS</span></td></tr>
+    </tbody>
+  </table>
+  <div class="doc-nh" style="margin-top:16px">WEIGHT BUDGET, ACCESSIBILITY SCOPE</div>
+  <table class="doc-tbl sm">
+    <thead><tr><th>Item</th><th>Mass kg</th><th>VCG m</th><th>Note</th></tr></thead>
+    <tbody>
+    <tr><td>Platform lifts, P and S, incl. trunk steel</td><td class="v">1 240</td><td>2.10</td><td>High VCG, drove battery relocation</td></tr>
+    <tr><td>Ceiling hoist tracks and structure, 4 cabins</td><td class="v">310</td><td>2.85</td><td>Tied to deck beams</td></tr>
+    <tr><td>Hydraulic bathing platform</td><td class="v">480</td><td>0.90</td><td>Low, favourable</td></tr>
+    <tr><td>Threshold pans, channels and drainage</td><td class="v">95</td><td>1.20</td><td>9 openings</td></tr>
+    <tr><td>Local deck reinforcement, chair loading</td><td class="v">210</td><td>1.15</td><td></td></tr>
+    <tr class="tot"><td>Accessibility scope total</td><td class="v">2 335</td><td>1.78</td><td>3.3% of full load</td></tr>
+    </tbody>
+  </table>
+  <div class="doc-kpi">
+    <div><span>MARGIN AT CONTRACT</span><b>8.0%</b></div>
+    <div><span>MARGIN NOW</span><b>5.4%</b></div>
+    <div><span>CONSUMED BY CO-041</span><b>0.62 t</b></div>
+    <div><span>STATUS</span><b>Within budget</b></div>
+  </div>
+  <div class="doc-intro" style="margin-top:12px">Note: the fourth loading condition is non standard and was added
+  specifically for this vessel. Twelve guests, several in powered chairs, can concentrate on one side far more
+  readily than ambulant guests. It is not a Code requirement. It is in the book because it will happen.</div>`})},
+
+/* ---------- supporting ---------- */
+cost:{ label:'Cost Envelope, Stage 1', kind:'COST SHEET', tag:'PROTOTYPE OUTPUT',
+ html:()=>sheet({kind:'COST ENVELOPE',title:'Stage 1 budget and build cost envelope',
+  no:'NA-2847-CE-001',rev:'B',drawn:'QS',chk:'PM',stamp:'FOR DISCUSSION',stampClass:'warn',
+  body:`
+  <table class="doc-tbl">
+    <thead><tr><th>Stage 1 line</th><th>Low</th><th>High</th><th>Basis</th></tr></thead>
+    <tbody>
+    <tr><td>Concept design and mission brief</td><td class="v">£38k</td><td class="v">£52k</td><td>Fixed</td></tr>
+    <tr><td>Preliminary naval architecture</td><td class="v">£52k</td><td class="v">£68k</td><td>Fixed</td></tr>
+    <tr><td>Accessibility standard and user panel</td><td class="v">£24k</td><td class="v">£32k</td><td>Incl. panel fees</td></tr>
+    <tr><td>1:1 cabin and wetroom mock up</td><td class="v">£28k</td><td class="v">£36k</td><td>Workshop + build</td></tr>
+    <tr><td>VR walkthrough</td><td class="v">£14k</td><td class="v">£22k</td><td>Fixed</td></tr>
+    <tr><td>CFD and motion study</td><td class="v">£32k</td><td class="v">£44k</td><td>Scope dependent</td></tr>
+    <tr><td>Lift and hoist systems rig</td><td class="v">£20k</td><td class="v">£28k</td><td>Supplier dependent</td></tr>
+    <tr><td>Regulatory feasibility, class and flag</td><td class="v">£18k</td><td class="v">£26k</td><td>Fixed</td></tr>
+    <tr><td>PM and contingency 10%</td><td class="v">£23k</td><td class="v">£31k</td><td>On above</td></tr>
+    <tr class="tot"><td>STAGE 1 TOTAL</td><td class="v">£249k</td><td class="v">£339k</td><td>Mid £295k</td></tr>
+    </tbody>
+  </table>
+  <div class="doc-nh" style="margin-top:16px">FORWARD STAGES, PLANNING RANGES</div>
+  <table class="doc-tbl sm"><tbody>
+    <tr><td>Stage 2, basic design and class approval</td><td class="v">£0.9m - £1.6m</td></tr>
+    <tr><td>Stage 3, build, 24.8m composite catamaran</td><td class="v">£6.0m - £11.0m</td></tr>
+    <tr><td>Stage 4, commissioning, trials and delivery</td><td class="v">£0.4m - £0.7m</td></tr>
+    <tr class="tot"><td>PROGRAMME TOTAL</td><td class="v">£7.5m - £13.6m</td></tr>
+  </tbody></table>
+  <div class="doc-intro" style="margin-top:12px"><b>Basis and exclusions.</b> Ranges derived from comparable
+  one off composite catamaran builds of 22 to 27 m, adjusted for accessibility scope at 3 to 5% of build cost.
+  Excludes VAT, owner supplied equipment, berthing, crew and finance costs. Not a quotation.</div>`})},
+
+aip:{ label:'Approval in Principle', kind:'CERTIFICATE', tag:'DETAILED DESIGN OUTPUT',
+ html:()=>sheet({kind:'CLASSIFICATION SOCIETY',title:'Approval in Principle',
+  no:'NA-2847-AIP-01',rev:'-',drawn:'CLASS',chk:'FLAG',stamp:'APPROVED',stampClass:'ok',
+  body:`
+  <div class="doc-cert">
+    <div class="doc-cert-h">APPROVAL IN PRINCIPLE</div>
+    <p>This is to certify that the design documentation submitted in respect of</p>
+    <div class="doc-cert-v">${PROJ.name}</div>
+    <p>has been examined and found to comply in principle with the applicable requirements of the
+    <b>Red Ensign Group Yacht Code, Part A</b>, applicable to yachts of 24 metres and over in load line
+    length carrying not more than 12 passengers.</p>
+    <table class="doc-tbl sm" style="margin:16px 0">
+      <tbody>
+      <tr><td>Lines plan and hydrostatics</td><td><span class="rs ok">APPROVED</span></td></tr>
+      <tr><td>Structural scantlings and laminate schedule</td><td><span class="rs ok">APPROVED</span></td></tr>
+      <tr><td>Intact and damage stability</td><td><span class="rs ok">APPROVED</span></td></tr>
+      <tr><td>Threshold equivalence case NA-2847-EQ-003</td><td><span class="rs ok">ACCEPTED</span></td></tr>
+      <tr><td>Evacuation arrangement, reduced mobility</td><td><span class="rs ok">ACCEPTED</span></td></tr>
+      <tr><td>Machinery and electrical schematics</td><td><span class="rs ok">APPROVED</span></td></tr>
+      </tbody>
+    </table>
+    <p class="doc-cert-n">Conditions: survey during construction required. Accessibility Project Standard
+    NA-2847-AS-001 rev 1.1 witnessed at hold points as a contractual item, noted but not a Code requirement.</p>
+  </div>
+  <div class="doc-sign">
+    <div><span>Surveyor to Class</span><i>signed</i></div>
+    <div><span>Flag Administration</span><i>accepted</i></div>
+  </div>
+  <div class="doc-intro" style="margin-top:12px">Illustrative certificate for demonstration. Format follows
+  standard class practice. Not an actual certificate.</div>`})},
+
+co:{ label:'Change Order 041', kind:'CHANGE ORDER', tag:'BUILD OUTPUT',
+ html:()=>sheet({kind:'CONTRACT CHANGE ORDER',title:'CO-041, sauna, port hull',
+  no:'NA-2847-CO-041',rev:'-',drawn:'OR',chk:'AC',stamp:'APPROVED, CONDITIONAL',stampClass:'warn',
+  body:`
+  <table class="doc-tbl">
+    <tbody>
+    <tr><td>Request</td><td>Owner, add two person sauna, port hull</td></tr>
+    <tr><td>Raised</td><td>Month 26, production drawings 60% complete</td></tr>
+    <tr><td>Disciplines affected</td><td>7</td></tr>
+    </tbody>
+  </table>
+  <div class="doc-nh" style="margin-top:14px">OPTIONS ASSESSED</div>
+  <table class="doc-tbl">
+    <thead><tr><th>Opt</th><th>Description</th><th>Cost</th><th>Schedule</th><th>Access impact</th><th>Outcome</th></tr></thead>
+    <tbody>
+    <tr class="bad-row"><td>Orig</td><td>As requested, full size</td><td class="v">£96k</td><td>5 wk</td>
+      <td>Removes Ø1600 outside cabin 3</td><td><span class="rs bad">REJECTED HP</span></td></tr>
+    <tr class="chg"><td>A</td><td>Reduced footprint, two person</td><td class="v">£74k</td><td>3 wk</td>
+      <td>Turning circle preserved</td><td><span class="rs ok">APPROVED</span></td></tr>
+    <tr><td>B</td><td>Relocate starboard</td><td class="v">£118k</td><td>9 wk</td>
+      <td>Displaces crew cabin</td><td><span class="rs">Not taken</span></td></tr>
+    <tr><td>C</td><td>Decline</td><td class="v">nil</td><td>-</td><td>None</td><td><span class="rs">Not taken</span></td></tr>
+    </tbody>
+  </table>
+  <div class="doc-kpi">
+    <div><span>APPROVED VALUE</span><b>£74,000</b></div>
+    <div><span>SCHEDULE</span><b>+3 weeks</b></div>
+    <div><span>WEIGHT</span><b>+620 kg</b></div>
+    <div><span>MARGIN AFTER</span><b>5.4%</b></div>
+  </div>
+  <div class="doc-intro" style="margin-top:12px"><b>Condition attached by User Panel.</b> Sauna bench to permit
+  lateral transfer from a wheelchair. Bench height 500 mm, clear transfer space 900 mm adjacent. Recorded as
+  hold point HP4a at fit out.</div>
+  <div class="doc-sign">
+    <div><span>Owner</span><i>signed</i></div>
+    <div><span>Accessibility Consultant</span><i>signed, conditional</i></div>
+    <div><span>Shipyard</span><i>signed</i></div>
+  </div>`})}
+
+};
+
+/* artifact name to document key */
+const ART_DOC = {
+  'Accessibility Project Standard v0.1':'std',
+  'Accessibility Standard v1.1':'std',
+  'Accessibility Standard v1.0':'std',
+  'Concept GA Rev C':'ga',
+  'Platform Comparison Study':'ga',
+  'Cost Envelope, Stage 1':'cost',
+  'User Validation Film, 3 min':'val',
+  'User Validation Film':'val',
+  'Lines Plan and Hydrostatics':'stab',
+  'Structural Calculations':'stab',
+  'Threshold Equivalence Case':'thr',
+  'Approval in Principle':'aip',
+  'Flag Acceptance Letter':'aip',
+  'Change Order 041':'co',
+  'As Built Package':'mtx'
+};
+
+function openDoc(key){
+  const d = DOCS[key];
+  if(!d) return;
+  let m = document.getElementById('docModal');
+  if(m) m.remove();
+  m = document.createElement('div');
+  m.id='docModal'; m.className='doc-ov';
+  m.innerHTML = `<div class="doc-box">
+    <div class="doc-bar">
+      <span class="doc-tag">${d.tag}</span>
+      <div class="doc-bt">${d.label}</div>
+      <button class="btn ghost" id="docPrint">Print</button>
+      <button class="doc-x" id="docX" aria-label="Close">✕</button>
+    </div>
+    <div class="doc-scroll">${d.html()}</div>
+  </div>`;
+  document.body.appendChild(m);
+  document.body.style.overflow='hidden';
+  const close=()=>{m.remove();document.body.style.overflow='';};
+  document.getElementById('docX').onclick=close;
+  document.getElementById('docPrint').onclick=()=>window.print();
+  m.onclick=e=>{if(e.target===m)close();};
+  addEventListener('keydown',function esc(e){
+    if(e.key==='Escape'){close();removeEventListener('keydown',esc);}
+  });
+  requestAnimationFrame(()=>m.classList.add('on'));
+}
+window.openDoc = openDoc;
+
+/* deliverables index, shown as a chip in each section */
+const DELIVERABLES = {
+  proto:['ga','std','val','cost'],
+  design:['thr','mtx','stab','aip'],
+  agents:['co','mtx'],
+  why:['ga','thr','mtx','val']
+};
+
+function renderDocIndex(sec){
+  const keys = DELIVERABLES[sec]||[];
+  return `<div class="g">
+    <div class="strip"><i>◆</i><div>These are the actual documents produced at this stage, rendered in full.
+      Open any of them. This is what the other side receives.</div></div>
+    <div class="g2">${keys.map(k=>{
+      const d=DOCS[k];
+      return `<button class="doc-card" onclick="openDoc('${k}')">
+        <div class="doc-card-k">${d.kind}</div>
+        <div class="doc-card-t">${d.label}</div>
+        <div class="doc-card-f"><span class="tag sky">${d.tag}</span><span class="doc-card-o">Open →</span></div>
+      </button>`;}).join('')}</div>
+  </div>`;
+}
+window.renderDocIndex = renderDocIndex;
+
+</script>
+
+<script>
+/* ============================================================
+   MARINE AGENT · renderers + app
+   ============================================================ */
+const esc = t => String(t == null ? '' : t).replace(/[<>&]/g, c => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;' }[c]));
+const cell = c => (c && typeof c === 'object')
+  ? `<span class="tag ${c.t || ''}">${esc(c.v)}</span>` : esc(c);
+const cards = a => `<div class="g${a.length === 4 ? 4 : 3}">${a.map(c =>
+  `<div class="card tight"><div class="lbl">${esc(c.l)}</div><div class="val">${esc(c.v)}</div>
+   ${c.s ? `<div class="sub">${esc(c.s)}</div>` : ''}</div>`).join('')}</div>`;
+const strip = (t, cls, ico) => t
+  ? `<div class="strip ${cls || ''}"><i>${ico || '◆'}</i><div>${t}</div></div>` : '';
+
+const R = {};
+
+/* ---------- 1 brief ---------- */
+R.brief = d => `<div class="g">
+  ${cards(d.cards)}
+  <div class="card"><div class="chead"><div class="ctitle">The five fixed decisions</div></div>
+    <table><thead><tr><th>Decision</th><th>Our position</th><th>What it drives</th></tr></thead><tbody>
+    ${d.rows.map(r => `<tr><td class="lead-c">${esc(r[0])}</td><td>${esc(r[1])}</td>
+      <td style="color:var(--ink45)">${esc(r[2])}</td></tr>`).join('')}</tbody></table></div>
+  ${strip(d.warn, 'warn', '⚠')}</div>`;
+
+/* ---------- 2 matrix ---------- */
+R.matrix = d => `<div class="g">
+  ${cards(d.cards)}
+  <div class="card"><div class="chead"><div class="ctitle">Platform comparison</div></div>
+    <table><thead><tr>${d.head.map(h => `<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>
+    ${d.rows.map(r => `<tr><td class="lead-c">${esc(r[0])}</td><td>${cell(r[1])}</td><td>${cell(r[2])}</td></tr>`).join('')}
+    </tbody></table></div>
+  <div class="card" style="border-left:3px solid var(--kelp)">
+    <div class="chead"><div class="ctitle">${esc(d.verdict.t)}</div><span class="tag ok">DECIDED</span></div>
+    <div style="font-size:14px;line-height:1.7;color:var(--ink70)">${esc(d.verdict.d)}</div></div></div>`;
+
+/* ---------- 3 spec ---------- */
+R.spec = d => `<div class="g">
+  ${d.groups.map(g => `<div class="card"><div class="chead"><div class="ctitle">${esc(g.t)}</div>
+    <span class="tag">${g.items.length} requirements</span></div>
+    <table><thead><tr><th>Requirement</th><th>Value</th><th>Why</th></tr></thead><tbody>
+    ${g.items.map(i => `<tr><td class="lead-c">${esc(i[0])}</td>
+      <td class="num" style="font-weight:700;color:var(--deep);white-space:nowrap">${esc(i[1])}</td>
+      <td style="color:var(--ink45)">${esc(i[2])}</td></tr>`).join('')}</tbody></table></div>`).join('')}
+  ${strip(d.warn, 'bad', '⚠')}</div>`;
+
+/* ---------- 4 deck plan ---------- */
+R.deck = d => `<div class="g">
+  ${cards(d.cards)}
+  <div class="deck">
+    <svg viewBox="0 0 620 300" role="img" aria-label="Concept deck plan, single level">
+      <defs><linearGradient id="hull" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#E4F0F7"/><stop offset="100%" stop-color="#CFE3EE"/></linearGradient></defs>
+      <path d="M60 40 Q300 8 560 60 L560 240 Q300 292 60 260 Z" fill="url(#hull)" stroke="#0F4C75" stroke-width="2"/>
+      <path d="M60 40 Q300 8 560 60 L560 100 Q300 56 60 84 Z" fill="#B9D7E6" opacity=".5"/>
+      <path d="M60 216 Q300 244 560 200 L560 240 Q300 292 60 260 Z" fill="#B9D7E6" opacity=".5"/>
+      <rect x="92" y="96" width="120" height="108" rx="7" fill="#fff" stroke="#3FA9D8" stroke-width="1.5"/>
+      <text x="152" y="142" text-anchor="middle" font-size="11" font-weight="700" fill="#0A3353">Foredeck</text>
+      <text x="152" y="158" text-anchor="middle" font-size="9" fill="#6A8294">1:14 ramp</text>
+      <rect x="226" y="92" width="178" height="116" rx="7" fill="#fff" stroke="#1273A8" stroke-width="2"/>
+      <text x="315" y="136" text-anchor="middle" font-size="12" font-weight="800" fill="#0A3353">Saloon · Galley</text>
+      <text x="315" y="153" text-anchor="middle" font-size="9" fill="#6A8294">850mm counters · 1500mm turn</text>
+      <rect x="418" y="96" width="60" height="50" rx="6" fill="#DFF3EC" stroke="#1B9E77" stroke-width="1.5"/>
+      <text x="448" y="118" text-anchor="middle" font-size="9" font-weight="700" fill="#13775A">HELM</text>
+      <text x="448" y="131" text-anchor="middle" font-size="8" fill="#13775A">roll-in</text>
+      <rect x="418" y="156" width="60" height="52" rx="6" fill="#fff" stroke="#3FA9D8" stroke-width="1.5"/>
+      <text x="448" y="180" text-anchor="middle" font-size="9" font-weight="700" fill="#0A3353">Cockpit</text>
+      <rect x="492" y="112" width="52" height="80" rx="6" fill="#FDF4E3" stroke="#C08A2E" stroke-width="1.5"/>
+      <text x="518" y="146" text-anchor="middle" font-size="9" font-weight="700" fill="#8A6114">Bathing</text>
+      <text x="518" y="159" text-anchor="middle" font-size="8" fill="#8A6114">platform</text>
+      <circle cx="252" cy="68" r="15" fill="#DFF3EC" stroke="#1B9E77" stroke-width="1.5"/>
+      <text x="252" y="72" text-anchor="middle" font-size="9" font-weight="700" fill="#13775A">LIFT</text>
+      <circle cx="252" cy="232" r="15" fill="#DFF3EC" stroke="#1B9E77" stroke-width="1.5"/>
+      <text x="252" y="236" text-anchor="middle" font-size="9" font-weight="700" fill="#13775A">LIFT</text>
+      <rect x="296" y="44" width="92" height="40" rx="6" fill="#fff" stroke="#3FA9D8" stroke-width="1.2"/>
+      <text x="342" y="62" text-anchor="middle" font-size="9" font-weight="700" fill="#0A3353">Cabin A</text>
+      <text x="342" y="74" text-anchor="middle" font-size="8" fill="#6A8294">accessible</text>
+      <rect x="296" y="216" width="92" height="40" rx="6" fill="#fff" stroke="#3FA9D8" stroke-width="1.2"/>
+      <text x="342" y="234" text-anchor="middle" font-size="9" font-weight="700" fill="#0A3353">Cabin B</text>
+      <text x="342" y="246" text-anchor="middle" font-size="8" fill="#6A8294">accessible</text>
+      <path d="M96 150 L540 150" stroke="#1B9E77" stroke-width="2.5" stroke-dasharray="7 5" opacity=".8"/>
+      <text x="80" y="154" font-size="8.5" fill="#13775A" font-weight="700">STEP FREE</text>
+    </svg>
+    <div class="legend">
+      <span><i style="background:#1B9E77"></i>Step free route, no threshold</span>
+      <span><i style="background:#3FA9D8"></i>Guest space, 1200mm circulation</span>
+      <span><i style="background:#C08A2E"></i>Water access</span>
+    </div>
+  </div>
+  <div class="card"><div class="chead"><div class="ctitle">Design notes</div></div>
+    ${d.notes.map(n => `<div class="item"><div class="item-i">◈</div>
+      <div><b>${esc(n[0])}</b><span>${esc(n[1])}</span></div></div>`).join('')}</div>
+  ${strip(d.warn, 'warn', '⚠')}</div>`;
+
+/* ---------- 5 prototype options ---------- */
+R.proto = d => `<div class="g">
+  ${d.options.map(o => `<div class="card" ${o.best ? 'style="border-color:rgba(27,158,119,.42)"' : ''}>
+    <div class="chead"><div class="ctitle">${esc(o.n)}</div>
+      <span>${o.best ? '<span class="tag ok">START HERE</span> ' : ''}<span class="tag">${esc(o.cost)}</span>
+      <span class="tag sky">${esc(o.time)}</span></span></div>
+    <div style="font-size:13.5px;color:var(--ink70);line-height:1.65">${esc(o.what)}</div>
+    <div style="font-size:13.5px;color:var(--ink);margin-top:8px;font-weight:550">${esc(o.why)}</div>
+    <div style="margin-top:10px">${o.gives.map(g =>
+      `<div class="row"><span class="dot"></span><span>${esc(g)}</span></div>`).join('')}</div></div>`).join('')}
+  ${strip(d.rec, 'ok', '✓')}</div>`;
+
+/* ---------- 6 cost and funding ---------- */
+R.cost = d => {
+  const mx = Math.max(...d.lines.map(l => l[2]));
+  return `<div class="g">
+  <div class="card hero-card"><div class="hc-in">
+    <div class="lbl">${esc(d.totalLabel)}</div><div class="hc-t" style="font-size:34px">${esc(d.total)}</div></div></div>
+  <div class="split">
+    <div class="card"><div class="chead"><div class="ctitle">Where it goes</div></div>
+      ${d.lines.map(l => `<div class="bar"><div class="bar-n">${esc(l[0])}</div>
+        <div class="track"><div class="fill" style="background:linear-gradient(90deg,#3FA9D8,#1273A8)"
+          data-fill="${(l[2] / mx * 100).toFixed(0)}%"></div></div>
+        <div class="bar-v">${esc(l[1])}</div></div>`).join('')}</div>
+    <div class="card"><div class="chead"><div class="ctitle">Where it comes from</div></div>
+      ${d.sources.map(s => `<div class="item"><div class="item-i">◆</div>
+        <div style="flex:1"><b>${esc(s.n)}</b><span>${esc(s.d)}</span></div>
+        <span class="tag ${s.t}">${esc(s.v)}</span></div>`).join('')}</div>
+  </div>
+  ${strip(d.note, '', '◷')}</div>`;
+};
+
+/* ---------- 7 user panel ---------- */
+R.panel = d => `<div class="g">
+  <div class="split">
+    <div class="card"><div class="chead"><div class="ctitle">Who sits on the panel</div>
+      <span class="tag">${d.members.length} seats</span></div>
+      ${d.members.map(m => `<div class="item"><div class="item-i">●</div>
+        <div><b>${esc(m[0])}</b><span>${esc(m[1])}</span></div></div>`).join('')}</div>
+    <div class="card"><div class="chead"><div class="ctitle">Authority at each gate</div></div>
+      ${d.gates.map(g => `<div class="kv"><span>${esc(g.g)}<br><span style="font-size:11.5px;color:var(--ink45)">${esc(g.d)}</span></span>
+        <b><span class="tag ${g.v === 'Veto' ? 'bad' : ''}">${esc(g.v)}</span></b></div>`).join('')}</div>
+  </div>
+  ${strip(d.pay, 'ok', '✓')}</div>`;
+
+/* ---------- 8 risk ---------- */
+R.risk = d => `<div class="g">
+  <div class="card"><div class="chead"><div class="ctitle">Risk register</div>
+    <span class="tag bad">3 critical</span></div>
+    <table><thead><tr><th>Risk</th><th>Likely</th><th>Impact</th><th>Mitigation</th></tr></thead><tbody>
+    ${d.rows.map(r => `<tr class="${r[4] === 'red' ? 'bad' : ''}">
+      <td class="lead-c">${esc(r[0])}</td>
+      <td><span class="tag ${r[1] === 'High' ? 'bad' : r[1] === 'Med' ? 'warn' : 'ok'}">${esc(r[1])}</span></td>
+      <td><span class="tag ${r[2] === 'High' ? 'bad' : r[2] === 'Med' ? 'warn' : 'ok'}">${esc(r[2])}</span></td>
+      <td style="color:var(--ink45)">${esc(r[3])}</td></tr>`).join('')}</tbody></table></div>
+  ${strip(d.note, '', '◷')}</div>`;
+
+/* ---------- 9 class ---------- */
+R.class = d => `<div class="g">
+  ${cards(d.cards)}
+  <div class="card"><div class="chead"><div class="ctitle">Regulatory map</div></div>
+    ${d.codes.map(c => `<div class="item"><div class="item-i">§</div>
+      <div style="flex:1"><b>${esc(c.n)}</b><span>${esc(c.d)}</span></div>
+      <span class="tag ${c.t}">${esc(c.a)}</span></div>`).join('')}</div>
+  ${strip(d.warn, 'bad', '⚠')}</div>`;
+
+/* ---------- 10 structural detail ---------- */
+R.detail = d => `<div class="g">
+  ${d.solutions.map(s => `<div class="card">
+    <div class="chead"><div class="ctitle">${esc(s.n)}</div>
+      <span><span class="tag">${esc(s.cost)}</span> <span class="tag sky">${esc(s.use)}</span></span></div>
+    <div style="font-size:13.5px;color:var(--ink70);line-height:1.65">${esc(s.how)}</div>
+    <div class="strip warn" style="margin-top:10px"><i>⚠</i><div>${esc(s.risk)}</div></div></div>`).join('')}
+  <div class="card"><div class="chead"><div class="ctitle">Structural consequences</div></div>
+    <table><thead><tr><th>Item</th><th>Approach</th><th>Why</th></tr></thead><tbody>
+    ${d.struct.map(r => `<tr><td class="lead-c">${esc(r[0])}</td><td>${esc(r[1])}</td>
+      <td style="color:var(--ink45)">${esc(r[2])}</td></tr>`).join('')}</tbody></table></div></div>`;
+
+/* ---------- 11 transfer points ---------- */
+R.transfer = d => `<div class="g">
+  ${d.points.map((p, i) => `<div class="card">
+    <div class="chead"><div class="ctitle">${i + 1}. ${esc(p.n)}</div></div>
+    <div class="kv"><span>Primary</span><b>${esc(p.p)}</b></div>
+    <div class="kv"><span>Backup</span><b>${esc(p.b)}</b></div>
+    <div class="kv"><span>On failure</span><b>${esc(p.f)}</b></div>
+    <div class="strip" style="margin-top:10px"><i>◆</i><div>${esc(p.note)}</div></div></div>`).join('')}
+  ${strip(d.warn, 'bad', '⚠')}</div>`;
+
+/* ---------- 12 safety ---------- */
+R.safety = d => `<div class="g">
+  <div class="card"><div class="chead"><div class="ctitle">Safety case measures</div>
+    <span class="tag">${d.measures.length} items</span></div>
+    ${d.measures.map(m => `<div class="item"><div class="item-i">⚑</div>
+      <div style="flex:1"><b>${esc(m.t)}</b><span>${esc(m.d)}</span></div>
+      <span class="tag ${m.s === 'Designed' ? 'ok' : m.s === 'Specified' ? 'sky' : 'warn'}">${esc(m.s)}</span></div>`).join('')}</div>
+  ${strip(d.note, 'warn', '⚠')}</div>`;
+
+/* ---------- 13 systems ---------- */
+R.systems = d => `<div class="g">
+  ${cards(d.cards)}
+  <div class="card"><div class="chead"><div class="ctitle">Systems brief</div></div>
+    <table><thead><tr><th>System</th><th>Selection</th><th>Accessibility driver</th></tr></thead><tbody>
+    ${d.rows.map(r => `<tr><td class="lead-c">${esc(r[0])}</td><td>${esc(r[1])}</td>
+      <td style="color:var(--ink45)">${esc(r[2])}</td></tr>`).join('')}</tbody></table></div></div>`;
+
+/* ---------- 14 timeline ---------- */
+R.timeline = d => `<div class="g">
+  <div class="card"><div class="chead"><div class="ctitle">Concept to delivery</div>
+    <span class="tag sky">40-52 months</span></div>
+    <div class="steps">${d.phases.map((p, i) => `
+      <div class="step ${p.s}"><div class="sdot">${p.s === 'done' ? '✓' : i + 1}</div>
+        <div><b>${esc(p.n)}</b><span>${esc(p.w)}</span></div>
+        <div class="when">${esc(p.d)}</div></div>`).join('')}</div></div>
+  <div class="card"><div class="chead"><div class="ctitle">Long lead items</div>
+    <span class="tag bad">critical path</span></div>
+    <table><thead><tr><th>Item</th><th>Lead time</th><th>Note</th></tr></thead><tbody>
+    ${d.leads.map(l => `<tr><td class="lead-c">${esc(l[0])}</td>
+      <td class="num" style="font-weight:700;color:var(--deep)">${esc(l[1])}</td>
+      <td style="color:var(--ink45)">${esc(l[2])}</td></tr>`).join('')}</tbody></table></div>
+  ${strip(d.warn, 'bad', '⚠')}</div>`;
+
+/* ---------- 15 deliverables ---------- */
+R.deliv = d => `<div class="g"><div class="g2">
+  ${d.stages.map(s => `<div class="card"><div class="chead"><div class="ctitle">${esc(s.n)}</div>
+    <span class="tag">${s.items.length}</span></div>
+    ${s.items.map(i => `<div class="row"><span class="dot"></span><span>${esc(i)}</span></div>`).join('')}</div>`).join('')}
+</div></div>`;
+
+/* ---------- 16 agents ---------- */
+const ROLES = [
+  ['Design & engineering', [
+    ['Naval architect', '⚓', 'Hull form, hydrostatics, stability, the whole technical spine', 1],
+    ['Yacht designer, exterior', '◺', 'Styling, deck geometry, sightlines from a seated position', 1],
+    ['Interior designer', '◳', 'Layout within the accessibility standard, materials, contrast', 1],
+    ['Structural engineer', '⊞', 'Scantlings, threshold details, lift trunk, hoist track structure', 1],
+    ['Systems / MEP engineer', '⚙', 'HVAC, plumbing, hydraulics, the lift and hoist integration', 0],
+    ['Electrical engineer', '⚡', 'Hybrid drive, battery, ring fenced reserve for transfer equipment', 0],
+    ['Hydrodynamics / CFD', '≈', 'Resistance, power, and the motion prediction accessibility depends on', 1],
+    ['Weight control engineer', '⚖', 'Weight budget from day one. The role owners skip and regret', 1],
+    ['Stability specialist', '⇕', 'Intact and damage stability, the class submission', 0],
+    ['Noise & vibration', '♪', 'Structure borne noise through hoist tracks and lift trunks', 0]
+  ]],
+  ['Accessibility', [
+    ['Accessibility consultant', '♿', 'Writes the project standard and holds contractual sign off', 1],
+    ['Occupational therapist', '✛', 'Turns lived experience into dimensions and transfer geometry', 1],
+    ['User co-design panel', '◉', 'Seven disabled users, paid, with a veto at two gates', 1],
+    ['Inclusive wayfinding', '◈', 'Contrast, tactile and audible signage for low vision and deaf guests', 0]
+  ]],
+  ['Regulatory', [
+    ['Class surveyor', '✓', 'Lloyd\u2019s, DNV or RINA. Plan approval and survey during build', 1],
+    ['Flag administration', '⚑', 'Red Ensign registry. Accepts the safety case and the equivalence', 1],
+    ['Compliance consultant', '§', 'REG Yacht Code Part A, MARPOL, MLC, load line', 0],
+    ['Tonnage measurer', '▣', 'Tonnage affects crew, code and marina cost', 0]
+  ]],
+  ['Commercial & legal', [
+    ['Owner\u2019s representative', '◆', 'Your person in the yard. Pays for itself several times over', 1],
+    ['Project manager', '▦', 'Programme, critical path, change control', 1],
+    ['Cost estimator / QS', '∑', 'Build cost model, variation pricing, reality checks', 0],
+    ['Maritime lawyer', '⚖', 'Build contract, refund guarantee, accessibility schedule annex', 1],
+    ['Insurance broker', '◍', 'Build risk and operating cover. Non standard vessels need specialists', 0],
+    ['VAT & tax adviser', '%', 'Flag, ownership structure, charter treatment', 0]
+  ]],
+  ['Build', [
+    ['Shipyard', '⛴', 'Composite catamaran capability at 24m plus', 0],
+    ['Composite engineer', '◫', 'Infusion, laminate schedule, local reinforcement', 0],
+    ['Lift & hoist specialist', '⇅', 'Rare marine discipline. Bring your own, do not rely on the yard', 1],
+    ['QA / QC inspector', '⊙', 'Independent inspection at hold points', 0],
+    ['Commissioning engineer', '⚗', 'Systems proving before trials', 0]
+  ]],
+  ['Funding & operations', [
+    ['Investor relations lead', '◈', 'Runs the five gates and the data room', 1],
+    ['Grant writer', '✎', 'Non dilutive money. Start nine months before you need it', 1],
+    ['Impact measurement', '◷', 'The logic model and the KPIs funders will hold you to', 0],
+    ['Charter / programme manager', '⚓', 'Revenue model, bookings, the operating case', 0],
+    ['Captain & crew', '☗', 'Trained in transfer technique and accessible operation', 0],
+    ['Accessible operations trainer', '✛', 'Drills, personal evacuation plans, guest briefing', 0]
+  ]]
+];
+
+R.agents = d => {
+  let n = 0, on = 0;
+  ROLES.forEach(g => g[1].forEach(r => { n++; if (r[3]) on++; }));
+  return `<div class="g">
+    <div class="g4">
+      <div class="card tight"><div class="lbl">ROLES DEFINED</div><div class="val num">${n}</div></div>
+      <div class="card tight"><div class="lbl">CONNECTED NOW</div><div class="val num" id="agOn">${on}</div></div>
+      <div class="card tight"><div class="lbl">STAGE</div><div class="val" style="font-size:16px">Prototype</div></div>
+      <div class="card tight"><div class="lbl">COVERAGE</div><div class="val num" id="agPct">${Math.round(on / n * 100)}%</div></div>
+    </div>
+    ${strip(d.note, '', '◆')}
+    ${ROLES.map(g => `<div class="aphase">${esc(g[0]).toUpperCase()}</div>
+      <div class="agrid">${g[1].map(r => `
+        <div class="agent ${r[3] ? 'on' : ''}">
+          <div class="agent-top"><div class="agent-ic">${r[1]}</div><b>${esc(r[0])}</b></div>
+          <p>${esc(r[2])}</p>
+          <div class="agent-f"><span class="agent-st">${r[3] ? 'CONNECTED' : 'NOT CONNECTED'}</span>
+            <button class="sw ${r[3] ? 'on' : ''}" role="switch" aria-checked="${!!r[3]}"
+              aria-label="Connect ${esc(r[0])}"></button></div>
+        </div>`).join('')}</div>`).join('')}
+  </div>`;
+};
+
+/* ---------- 17 investors ---------- */
+R.invest = d => `<div class="g">
+  ${d.gates.map(g => `<div class="card ${g.s === 'now' ? '' : ''}"
+    style="border-left:3px solid ${g.s === 'done' ? 'var(--kelp)' : g.s === 'now' ? 'var(--ocean)' : 'var(--hair)'}">
+    <div class="chead"><div class="ctitle">${esc(g.n)}</div>
+      <span><span class="tag ${g.s === 'done' ? 'ok' : g.s === 'now' ? 'sky' : ''}">${esc(g.amt)}</span>
+      ${g.s === 'now' ? '<span class="tag sky">YOU ARE HERE</span>' : ''}</span></div>
+    <div class="kv"><span>Who</span><b>${esc(g.who)}</b></div>
+    <div class="kv"><span>The ask</span><b>${esc(g.ask)}</b></div>
+    <div class="kv"><span>What they must see</span><b>${esc(g.give)}</b></div>
+    <div class="strip" style="margin-top:10px"><i>?</i><div>Their real question: <b>${esc(g.q)}</b></div></div></div>`).join('')}
+  <div class="card"><div class="chead"><div class="ctitle">Data room checklist</div>
+    <span class="tag">${d.room.length} documents</span></div>
+    <div class="g2">${d.room.map(x =>
+      `<div class="row"><span class="dot"></span><span>${esc(x)}</span></div>`).join('')}</div></div>
+  ${strip(d.warn, 'bad', '⚠')}</div>`;
+
+/* ---------- 18 raci ---------- */
+R.raci = d => `<div class="g">
+  <div class="card"><div class="chead"><div class="ctitle">Decision authority</div></div>
+    <table><thead><tr>${d.head.map(h => `<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>
+    ${d.rows.map((r, i) => `<tr class="${i === 1 || i === 8 ? 'hi' : ''}">
+      <td class="lead-c">${esc(r[0])}</td>
+      <td><b style="color:var(--deep)">${esc(r[1])}</b></td>
+      <td style="color:var(--ink45)">${esc(r[2])}</td>
+      <td style="color:var(--ink45)">${esc(r[3])}</td></tr>`).join('')}</tbody></table></div>
+  ${strip(d.warn, 'bad', '⚠')}</div>`;
+
+/* ---------- 19 yard ---------- */
+R.yard = d => `<div class="g">
+  <div class="card"><div class="chead"><div class="ctitle">Selection criteria</div></div>
+    <table><thead><tr><th>Criterion</th><th>Weight</th><th>Why</th></tr></thead><tbody>
+    ${d.criteria.map(c => `<tr><td class="lead-c">${esc(c[0])}</td>
+      <td><span class="tag ${c[1] === 'Critical' ? 'bad' : 'warn'}">${esc(c[1])}</span></td>
+      <td style="color:var(--ink45)">${esc(c[2])}</td></tr>`).join('')}</tbody></table></div>
+  <div class="card"><div class="chead"><div class="ctitle">What must be in the contract</div>
+    <span class="tag bad">non negotiable</span></div>
+    ${d.contract.map(c => `<div class="item"><div class="item-i">§</div>
+      <div><b>${esc(c.n)}</b><span>${esc(c.d)}</span></div></div>`).join('')}</div></div>`;
+
+/* ---------- 20 thesis ---------- */
+R.thesis = d => `<div class="g">
+  <div class="card"><div class="chead"><div class="ctitle">Adapted versus designed</div></div>
+    <table><thead><tr><th></th><th>Adapted yacht</th><th>Accessibility first</th></tr></thead><tbody>
+    ${d.compare.map(r => `<tr><td class="lead-c">${esc(r[0])}</td>
+      <td style="color:var(--ink45)">${esc(r[1])}</td>
+      <td style="color:var(--deep);font-weight:550">${esc(r[2])}</td></tr>`).join('')}</tbody></table></div>
+  <div class="g2">${d.pts.map(p => `<div class="card">
+    <div class="chead"><div class="ctitle">${esc(p.i)} ${esc(p.t)}</div></div>
+    <div style="font-size:13.5px;color:var(--ink70);line-height:1.7">${esc(p.d)}</div></div>`).join('')}</div></div>`;
+
+/* ---------- 21 method ---------- */
+R.method = d => `<div class="g">
+  ${d.items.map(m => `<div class="card">
+    <div class="chead"><div class="ctitle"><span class="num" style="color:var(--ocean)">${esc(m.i)}</span> ${esc(m.t)}</div></div>
+    <div style="font-size:14px;color:var(--ink70);line-height:1.7">${esc(m.d)}</div>
+    <div class="strip ok" style="margin-top:10px"><i>✓</i><div>${esc(m.proof)}</div></div></div>`).join('')}
+  ${strip(d.honest, 'warn', '◆')}</div>`;
+
+/* ---------- 22 fees ---------- */
+R.fees = d => `<div class="g">
+  ${d.stages.map(s => `<div class="card">
+    <div class="chead"><div class="ctitle">${esc(s.n)}</div>
+      <span><span class="tag sky">${esc(s.fee)}</span> <span class="tag">${esc(s.when)}</span></span></div>
+    <div class="kv"><span>Includes</span><b style="max-width:62%">${esc(s.inc)}</b></div>
+    <div class="kv"><span>You end up with</span><b>${esc(s.out)}</b></div></div>`).join('')}
+  <div class="card"><div class="chead"><div class="ctitle">Terms</div></div>
+    ${d.terms.map(t => `<div class="kv"><span>${esc(t[0])}</span><b>${esc(t[1])}</b></div>`).join('')}</div>
+  ${strip(d.note, '', '◷')}</div>`;
+
+/* ---------- 23 impact ---------- */
+R.impact = d => `<div class="g">
+  <div class="card"><div class="chead"><div class="ctitle">Logic model</div></div>
+    <div class="steps">${d.model.map((m, i) => `<div class="step ${i === 0 ? 'done' : ''}">
+      <div class="sdot">${i + 1}</div><div><b>${esc(m[0])}</b><span>${esc(m[1])}</span></div>
+      <div class="when"></div></div>`).join('')}</div></div>
+  <div class="card"><div class="chead"><div class="ctitle">Committed measures</div></div>
+    <table><thead><tr><th>Measure</th><th>Target</th><th>Method</th></tr></thead><tbody>
+    ${d.kpis.map(k => `<tr><td class="lead-c">${esc(k.k)}</td>
+      <td><span class="tag sky">${esc(k.v)}</span></td>
+      <td style="color:var(--ink45)">${esc(k.d)}</td></tr>`).join('')}</tbody></table></div>
+  ${strip(d.warn, 'warn', '◆')}</div>`;
+
+/* ---------- 24 start ---------- */
+R.start = d => `<div class="g">
+  <div class="card"><div class="chead"><div class="ctitle">Before any money changes hands</div></div>
+    <div class="steps">${d.steps.map((s, i) => `<div class="step ${i === 0 ? 'now' : ''}">
+      <div class="sdot">${i + 1}</div><div><b>${esc(s.n)}</b><span>${esc(s.d)}</span></div>
+      <div class="when">${esc(s.w)}</div></div>`).join('')}</div></div>
+  <div class="card"><div class="chead"><div class="ctitle">Bring to the first call</div></div>
+    ${d.bring.map(b => `<div class="row"><span class="dot"></span><span>${esc(b)}</span></div>`).join('')}</div>
+  ${strip(d.honest, 'warn', '◆')}
+  <div class="acts">
+    <button class="act primary" onclick="alert('In the live site this opens the booking form.')">Book a discovery call</button>
+    <button class="act" onclick="alert('In the live site this downloads the standard.')">Download the accessibility standard</button>
+  </div></div>`;
+
+/* ============================================================
+   APP
+   ============================================================ */
+const $ = s => document.querySelector(s);
+let sec = 'proto';
+
+$('#tabs').innerHTML = SECTIONS.map(s =>
+  `<button class="tab ${s.id === sec ? 'on' : ''}" data-s="${s.id}">
+    <div class="tab-n">${s.n}</div><b>${s.t}</b><span>${s.s}</span></button>`).join('');
+
+function chips(filter) {
+  const q = (filter || '').toLowerCase().trim();
+  const match = txt => !q || q.split(/\s+/).every(w => txt.toLowerCase().includes(w));
+
+  const demos = DEMO_CHIPS.filter(c => c.sec === sec)
+    .filter(c => match(c.t + ' ' + c.q + ' demo watch play ' + (RUNS[c.key] ? RUNS[c.key].sub : '')));
+  const list = D.map((d, i) => ({ d, i })).filter(({ d }) => d.sec === sec)
+    .filter(({ d }) => match(d.t + ' ' + d.q + ' ' + (d.k || []).join(' ') + ' ' + d.lead));
+
+  const delivHtml = (!q || match('deliverable output document drawing see the actual output'))
+    ? `<button class="chip deliv" data-deliv="1">
+        <span class="chip-n doc">▣</span>
+        <span class="chip-x"><b>DELIVERABLES · see the actual output</b>
+        <span>Open the real drawings, standards and certificates this stage produces</span></span></button>` : '';
+
+  const demoHtml = demos.map(c => `<button class="chip demo" data-run="${c.key}">
+      <span class="chip-n play">▶</span>
+      <span class="chip-x"><b>${esc(c.t)}</b><span>${esc(c.q)}</span></span></button>`).join('');
+  const listHtml = list.map(({ d, i }, n) => `<button class="chip" data-i="${i}">
+      <span class="chip-n">${String(n + 1).padStart(2, '0')}</span>
+      <span class="chip-x"><b>${esc(d.t)}</b><span>${esc(d.q)}</span></span></button>`).join('');
+
+  $('#chips').innerHTML = (demos.length + list.length + (delivHtml ? 1 : 0))
+    ? delivHtml + demoHtml + listHtml
+    : `<div class="card" style="grid-column:1/-1">No match in this section. Try another section or a different word.</div>`;
+  $('#cnt').textContent = q ? (demos.length + list.length) + ' results' : '';
+  document.querySelectorAll('.chip[data-i]').forEach(c => c.onclick = () => play(+c.dataset.i));
+  document.querySelectorAll('.chip[data-run]').forEach(c => c.onclick = () => playRun(c.dataset.run));
+  document.querySelectorAll('.chip[data-deliv]').forEach(c => c.onclick = () => showDeliverables());
+}
+
+function setSec(id) {
+  sec = id;
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('on', t.dataset.s === id));
+  $('#stage').classList.remove('on');
+  $('#search').value = '';
+  chips('');
+  scrollTo({ top: 0, behavior: 'smooth' });
+}
+document.querySelectorAll('.tab').forEach(t => t.onclick = () => setSec(t.dataset.s));
+$('#search').addEventListener('input', e => chips(e.target.value));
+$('#search').addEventListener('keydown', e => {
+  if (e.key === 'Enter') { const f = document.querySelector('.chip'); if (f) f.click(); }
+});
+
+function showDeliverables(){
+  const t = SECTIONS.find(s => s.id === sec).t;
+  $('#stage').innerHTML = `
+    <div class="navrow">
+      <button class="btn ghost" id="backBtn">← Back</button>
+      <span class="t">${esc(t)} deliverables</span>
+    </div>
+    <div class="ask"><div class="ask-q">Show me what we actually receive at this stage.</div></div>
+    <div class="ans"><div class="orb"></div><div class="ans-body">
+      <div class="srcs"><span class="src">DELIVERABLE REGISTER</span><span class="src">ISSUED SET</span></div>
+      <div class="lead">Every document below is rendered in full. Open one and you are looking at the same sheet
+      the yard, the class surveyor and your investors receive.</div>
+      ${renderDocIndex(sec)}
+    </div></div>`;
+  $('#stage').classList.add('on');
+  $('#backBtn').onclick = () => { $('#stage').classList.remove('on'); scrollTo({ top: 0, behavior: 'smooth' }); };
+  $('#stage').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function play(i) {
+  const d = D[i];
+  const fn = R[d.type];
+  const body = fn ? fn(d.data) : '<div class="card">Renderer missing.</div>';
+  const idx = D.filter(x => x.sec === d.sec).indexOf(d);
+  const total = D.filter(x => x.sec === d.sec).length;
+
+  $('#stage').innerHTML = `
+    <div class="navrow">
+      <button class="btn ghost" id="backBtn">← All ${SECTIONS.find(s => s.id === d.sec).t.toLowerCase()}</button>
+      <span class="t">${idx + 1} of ${total}</span>
+      <button class="btn" id="prevBtn" ${idx === 0 ? 'disabled' : ''}>Previous</button>
+      <button class="btn" id="nextBtn" ${idx === total - 1 ? 'disabled' : ''}>Next</button>
+    </div>
+    <div class="ask"><div class="ask-q">${esc(d.q)}</div></div>
+    <div class="ans"><div class="orb"></div><div class="ans-body">
+      <div class="srcs">${d.src.map(s => `<span class="src">${esc(s)}</span>`).join('')}</div>
+      <div class="lead">${esc(d.lead)}</div>
+      ${body}
+      <div class="insight"><b>What this means.</b> ${esc(d.ins)}</div>
+    </div></div>`;
+  $('#stage').classList.add('on');
+
+  requestAnimationFrame(() => {
+    document.querySelectorAll('.fill[data-fill]').forEach(f => { f.style.width = f.dataset.fill; });
+  });
+  wireAgents();
+
+  $('#backBtn').onclick = () => { $('#stage').classList.remove('on'); scrollTo({ top: 0, behavior: 'smooth' }); };
+  const same = D.map((x, n) => ({ x, n })).filter(o => o.x.sec === d.sec);
+  const p = $('#prevBtn'), nx = $('#nextBtn');
+  if (idx > 0) p.onclick = () => play(same[idx - 1].n);
+  if (idx < total - 1) nx.onclick = () => play(same[idx + 1].n);
+  $('#stage').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function wireAgents() {
+  const sws = document.querySelectorAll('.agent .sw');
+  if (!sws.length) return;
+  const upd = () => {
+    const all = document.querySelectorAll('.agent').length;
+    const on = document.querySelectorAll('.agent.on').length;
+    const a = document.getElementById('agOn'), b = document.getElementById('agPct');
+    if (a) a.textContent = on;
+    if (b) b.textContent = Math.round(on / all * 100) + '%';
+  };
+  sws.forEach(sw => sw.onclick = () => {
+    const card = sw.closest('.agent');
+    const on = !card.classList.contains('on');
+    card.classList.toggle('on', on);
+    sw.classList.toggle('on', on);
+    sw.setAttribute('aria-checked', on);
+    card.querySelector('.agent-st').textContent = on ? 'CONNECTED' : 'NOT CONNECTED';
+    upd();
+  });
+}
+
+$('#journeyBtn').onclick = () => { setSec('why'); setTimeout(() => playRun('run-journey'), 200); };
+$('#startBtn').onclick = () => {
+  setSec('why');
+  setTimeout(() => {
+    const i = D.findIndex(d => d.type === 'start');
+    if (i >= 0) play(i);
+  }, 260);
+};
+
+chips('');
+
+/* splash */
+(function () {
+  const sp = document.getElementById('splash'), app = document.querySelector('.shell');
+  if (!sp) return;
+  document.body.classList.add('sp-lock');
+  let closed = false;
+  const close = () => {
+    if (closed) return;
+    closed = true;
+    sp.classList.add('done');
+    document.body.classList.remove('sp-lock');
+    if (app) app.classList.add('sp-in');
+    setTimeout(() => sp.remove(), 900);
+  };
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  setTimeout(close, reduce ? 400 : 3300);
+  sp.addEventListener('click', close);
+  sp.addEventListener('touchstart', close, { passive: true });
+  addEventListener('keydown', e => { if (e.key === 'Escape' || e.key === ' ') close(); });
+})();
+
+</script>
+
+<script>
+/* ============================================================
+   MARINE AGENT · demo player
+   ============================================================ */
+let RUN = { timer:null, i:0, steps:[], playing:false, speed:1, key:null };
+
+function flatSteps(run){
+  const out=[];
+  run.phases.forEach(ph=>ph.steps.forEach(s=>out.push({...s,phase:ph.p})));
+  return out;
+}
+
+function renderRun(key){
+  const run = RUNS[key];
+  RUN.key = key;
+  RUN.steps = flatSteps(run);
+  RUN.i = 0;
+  RUN.playing = false;
+  clearInterval(RUN.timer);
+
+  const total = RUN.steps.length;
+  let html = `
+    <div class="rn">
+      <div class="rn-head">
+        <div>
+          <div class="rn-eyebrow">LIVE DEMO</div>
+          <div class="rn-t">${esc(run.title)}</div>
+          <div class="rn-s">${esc(run.sub)}</div>
+        </div>
+        <div class="rn-ctl">
+          <button class="btn primary" id="rnPlay">▶ Play</button>
+          <button class="btn" id="rnStep">Step</button>
+          <button class="btn" id="rnEnd">Skip to result</button>
+          <button class="btn ghost" id="rnReset">Reset</button>
+        </div>
+      </div>
+      <div class="rn-input"><b>Starting point.</b> ${esc(run.input)}</div>
+      <div class="rn-prog"><i id="rnBar"></i></div>
+      <div class="rn-meta"><span id="rnCount">0 of ${total} steps</span><span id="rnPhase"></span></div>
+
+      <div class="rn-grid">
+        <div class="rn-log" id="rnLog">
+          <div class="rn-empty">Press play. Each agent joins, does its work and hands over.</div>
+        </div>
+        <div class="rn-side">
+          <div class="card tight">
+            <div class="lbl">AGENTS ENGAGED</div>
+            <div class="val num" id="rnAgents">0</div>
+            <div class="rn-faces" id="rnFaces"></div>
+          </div>
+          <div class="card tight">
+            <div class="lbl">ARTIFACTS PRODUCED</div>
+            <div class="rn-arts" id="rnArts"><div class="rn-none">none yet</div></div>
+          </div>
+          <div class="card tight">
+            <div class="lbl">ISSUES CAUGHT</div>
+            <div class="val num" id="rnFinds">0</div>
+            <div class="sub">Each one is a problem found before it was built</div>
+          </div>
+        </div>
+      </div>
+      <div id="rnResult"></div>
+    </div>`;
+  return html;
+}
+
+function wireRun(){
+  const run = RUNS[RUN.key];
+  if(!run) return;
+  const log=document.getElementById('rnLog');
+  const bar=document.getElementById('rnBar');
+  const cnt=document.getElementById('rnCount');
+  const phs=document.getElementById('rnPhase');
+  const faces=document.getElementById('rnFaces');
+  const arts=document.getElementById('rnArts');
+  const seen=new Set();
+  let finds=0;
+
+  function doStep(){
+    if(RUN.i>=RUN.steps.length){ stop(); finish(); return; }
+    const s=RUN.steps[RUN.i];
+    if(RUN.i===0) log.innerHTML='';
+
+    const prev=RUN.i>0?RUN.steps[RUN.i-1].phase:null;
+    if(s.phase!==prev){
+      const ph=document.createElement('div');
+      ph.className='rn-phase';
+      ph.textContent=s.phase;
+      log.appendChild(ph);
+    }
+
+    const row=document.createElement('div');
+    row.className='rn-step working';
+    row.innerHTML=`
+      <div class="rn-ic">${s.i}</div>
+      <div class="rn-x">
+        <div class="rn-a">${esc(s.a)}</div>
+        <div class="rn-tt">${esc(s.t)}</div>
+        <div class="rn-d">${esc(s.d)}</div>
+        ${s.art?`<div class="rn-art" ${ART_DOC[s.art.n]?`onclick="openDoc('${ART_DOC[s.art.n]}')" title="Open the document"`:''}>
+           <span class="rn-k">${esc(s.art.k)}</span>${esc(s.art.n)}${ART_DOC[s.art.n]?' <b style="color:var(--ocean)">open →</b>':''}</div>`:''}
+        ${s.find?`<div class="rn-find ${/FAIL|flag|catch|hard|Watch|tight|Revealing/i.test(s.find.t)?'bad':/PASS|Leverage|met|worked/i.test(s.find.t)?'ok':''}">
+           <b>${esc(s.find.t)}</b> ${esc(s.find.d)}</div>`:''}
+      </div>
+      <div class="rn-tick">●</div>`;
+    log.appendChild(row);
+    log.scrollTop=log.scrollHeight;
+
+    setTimeout(()=>{ row.classList.remove('working'); row.classList.add('done'); }, Math.min(s.ms*0.6,900)/RUN.speed);
+
+    if(!seen.has(s.a)){
+      seen.add(s.a);
+      const f=document.createElement('span');
+      f.className='rn-face'; f.title=s.a; f.textContent=s.i;
+      faces.appendChild(f);
+      document.getElementById('rnAgents').textContent=seen.size;
+    }
+    if(s.art){
+      if(arts.querySelector('.rn-none')) arts.innerHTML='';
+      const a=document.createElement('div');
+      a.className='rn-artrow';
+      a.innerHTML=`<span class="rn-k">${esc(s.art.k)}</span>${esc(s.art.n)}${ART_DOC[s.art.n]?' <b style="color:var(--ocean);margin-left:auto">open</b>':''}`;
+      if(ART_DOC[s.art.n]) a.onclick=()=>openDoc(ART_DOC[s.art.n]);
+      arts.appendChild(a);
+    }
+    if(s.find){ finds++; document.getElementById('rnFinds').textContent=finds; }
+
+    RUN.i++;
+    bar.style.width=(RUN.i/RUN.steps.length*100)+'%';
+    cnt.textContent=RUN.i+' of '+RUN.steps.length+' steps';
+    phs.textContent=s.phase;
+  }
+
+  function finish(){
+    const r=run.result;
+    document.getElementById('rnResult').innerHTML=`
+      <div class="rn-done">
+        <div class="rn-done-t">✓ ${esc(r.t)}</div>
+        <div class="g4" style="margin:14px 0">
+          ${r.kpis.map(k=>`<div class="rn-kpi"><div class="lbl">${esc(k.l)}</div>
+            <div class="val num">${esc(k.v)}</div></div>`).join('')}
+        </div>
+        <div class="rn-out">
+          <div class="lbl" style="margin-bottom:8px">WHAT YOU HOLD AT THE END</div>
+          ${r.out.map(o=>`<div class="row"><span class="dot"></span><span>${esc(o)}</span></div>`).join('')}
+        </div>
+        <div class="strip warn" style="margin-top:12px"><i>◆</i><div>${esc(r.note)}</div></div>
+        <div class="lbl" style="margin:16px 0 8px">OPEN THE ACTUAL DOCUMENTS</div>
+        <div class="g2">${[...new Set(RUN.steps.filter(s=>s.art&&ART_DOC[s.art.n]).map(s=>ART_DOC[s.art.n]))]
+          .map(k=>`<button class="doc-card" onclick="openDoc('${k}')">
+            <div class="doc-card-k">${DOCS[k].kind}</div>
+            <div class="doc-card-t">${DOCS[k].label}</div>
+            <div class="doc-card-f"><span class="tag sky">${DOCS[k].tag}</span>
+            <span class="doc-card-o">Open →</span></div></button>`).join('')}</div>
+      </div>`;
+    document.getElementById('rnResult').scrollIntoView({behavior:'smooth',block:'nearest'});
+  }
+
+  function tick(){
+    if(RUN.i>=RUN.steps.length){ stop(); finish(); return; }
+    const ms=RUN.steps[RUN.i].ms/RUN.speed;
+    doStep();
+    RUN.timer=setTimeout(tick,ms);
+  }
+  function startPlay(){
+    RUN.playing=true;
+    document.getElementById('rnPlay').textContent='❚❚ Pause';
+    tick();
+  }
+  function stop(){
+    RUN.playing=false;
+    clearTimeout(RUN.timer);
+    const b=document.getElementById('rnPlay');
+    if(b) b.textContent= RUN.i>=RUN.steps.length ? '▶ Replay' : '▶ Play';
+  }
+
+  document.getElementById('rnPlay').onclick=()=>{
+    if(RUN.i>=RUN.steps.length){ wireRunReset(); return; }
+    RUN.playing?stop():startPlay();
+  };
+  document.getElementById('rnStep').onclick=()=>{ stop(); doStep(); if(RUN.i>=RUN.steps.length) finish(); };
+  document.getElementById('rnEnd').onclick=()=>{
+    stop();
+    while(RUN.i<RUN.steps.length) doStep();
+    finish();
+  };
+  document.getElementById('rnReset').onclick=()=>wireRunReset();
+
+  function wireRunReset(){
+    stop();
+    playRun(RUN.key);
+  }
+}
+
+function playRun(key){
+  const run=RUNS[key];
+  const stage=document.getElementById('stage');
+  stage.innerHTML=`
+    <div class="navrow">
+      <button class="btn ghost" id="backBtn">← Back</button>
+      <span class="t">Live demo</span>
+    </div>
+    ${renderRun(key)}`;
+  stage.classList.add('on');
+  wireRun();
+  document.getElementById('backBtn').onclick=()=>{
+    clearTimeout(RUN.timer);
+    stage.classList.remove('on');
+    scrollTo({top:0,behavior:'smooth'});
+  };
+  stage.scrollIntoView({behavior:'smooth',block:'start'});
+}
+window.playRun=playRun;
+
+</script>
+</body>
+</html>
